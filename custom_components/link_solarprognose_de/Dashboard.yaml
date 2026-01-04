@@ -43,7 +43,7 @@ views:
                 data_generator: |
                   /* Transformiert die Liste aus dem forecast-Attribut */
                   return entity.attributes.forecast.map((entry) => {
-                    return [new Date(entry.datetime).getTime(), entry.value];
+                    return [new Date(entry.datetime).getTime(), entry.energy];
                   });
           - type: vertical-stack
             cards:
@@ -62,33 +62,6 @@ views:
                     name: Letzter Abruf
                   - entity: sensor.solarprognose_nachste_abfragezeit
                     name: Nächster geplanter Abruf
-      - type: grid
-        cards:
-          - type: vertical-stack
-            cards:
-              - type: heading
-                heading: Solar-Vorhersage
-                heading_style: title
-                icon: mdi:sun-clock
-              - type: grid
-                columns: 2
-                square: false
-                cards:
-                  - type: tile
-                    entity: sensor.solarprognose_heute_gesamt
-                    color: orange
-                    vertical: false
-                    features_position: bottom
-                  - type: tile
-                    entity: sensor.solarprognose_resttag
-                    color: amber
-              - type: energy-solar-graph
-                title: Stündliche Kurve
-              - type: entities
-                entities:
-                  - entity: sensor.solarprognose_morgen_gesamt
-                  - entity: sensor.solarprognose_api_status
-                  - entity: sensor.solarprognose_letzte_abfrage
     type: sections
     max_columns: 4
     cards: []
