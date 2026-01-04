@@ -132,7 +132,7 @@ Standardmäßig erfolgt eine Aktualisierung alle 150 Minuten unter Berücksichti
 
 ## Kompatibilität
 
-- Home Assistant Version 2023.6 oder neuer
+- Home Assistant Version 2025.3 oder neuer
 - Config Flow Unterstützung
 - HACS-kompatibel
 
