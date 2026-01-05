@@ -1,6 +1,15 @@
-# Solarprognose.de (Community Integration für Home Assistant)
+# Solarprognose.de (Community Integration for Home Assistant)
 
-## WICHTIGER HINWEIS / HAFTUNGSAUSSCHLUSS
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
+
+[🇩🇪 Deutsch](#-deutsch) | [🇺🇸 English](#-english)
+
+---
+
+<a name="-deutsch"></a>
+## 🇩🇪 Deutsch
+
+### WICHTIGER HINWEIS / HAFTUNGSAUSSCHLUSS
 
 DIESE SOFTWARE WIRD **OHNE JEGLICHE GARANTIE** ZUR VERFÜGUNG GESTELLT.
 
@@ -18,134 +27,79 @@ INSBESONDERE SIND DIE BERECHNETEN PROGNOSEWERTE **NICHT** FÜR:
 - GARANTIE- ODER GEWÄHRLEISTUNGSZWECKE
 - VERTRAGLICHE ODER RECHTLICHE ENTSCHEIDUNGEN
 - KRITISCHE STEUERUNGEN
-
 GEEIGNET.
 
 MIT DER INSTALLATION UND NUTZUNG DIESER INTEGRATION ERKLÄRST DU DICH AUSDRÜCKLICH DAMIT EINVERSTANDEN.
 
 ---
 
-## Beschreibung
+### Beschreibung
+Diese Custom Integration für Home Assistant bindet die WebAPI von Solarprognose.de ein und stellt PV-Ertragsprognosen als Sensoren zur Verfügung. Es handelt sich um eine **nicht-offizielle Community-Integration**. Es besteht **keine Verbindung** zum Betreiber von Solarprognose.de.
 
-Diese Custom Integration für Home Assistant bindet die WebAPI von Solarprognose.de ein und stellt PV-Ertragsprognosen als Sensoren zur Verfügung.
+### 🔑 API-Zugang erhalten (Kurzanleitung)
+Um diese Integration zu nutzen, benötigst du einen Account bei Solarprognose.de:
+1. Registriere dich auf [Solarprognose.de](https://www.solarprognose.de).
+2. Erstelle unter **"Anlageneinstellungen"** eine neue PV-Anlage.
+3. Gehe zu **"User-Einstellungen"** -> **"Schnittstelle / API"**.
+4. Kopiere deinen **API-Key** oder die fertige **API-URL**.
 
-Es handelt sich um eine **nicht-offizielle Community-Integration**. Es besteht **keine Verbindung** zum Betreiber von Solarprognose.de.
+### Installation via HACS (Empfohlen)
+[![Open your Home Assistant instance and open a repository window in HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=matkoeout&repository=link_solarprognose_de&category=Integration)
 
----
-
-## Funktionsumfang
-
-- Prognose des heutigen Gesamtertrags
-- Prognose des morgigen Gesamtertrags
-- Prognose des verbleibenden Tagesertrags
-- Leistung aktuelle Stunde
-- Leistung nächste Stunde
-- Aggregierte Tagesprognose (nicht für das Energy Dashboard geeignet)
-- Anzeige der nächsten erlaubten API-Abfragezeit
-- Zähler für tägliche API-Aufrufe
-- API-Status- und Fehlermeldungssensor
+1. Klicke auf den Button oben (erfordert [My Home Assistant](https://my.home-assistant.io/)).
+2. Manuell: **HACS** -> **Integrationen** -> Drei Punkte (oben rechts) -> **Benutzerdefinierte Repositories**.
+3. URL: `https://github.com/matkoeout/link_solarprognose_de` | Kategorie: **Integration**.
+4. Klicke auf **Herunterladen** und starte Home Assistant neu.
 
 ---
 
-## Installation
+<a name="-english"></a>
+## 🇺🇸 English
 
-### Installation über HACS (empfohlen)
+### IMPORTANT NOTICE / DISCLAIMER
 
-1. HACS öffnen
-2. Integrationen → Benutzerdefinierte Repositories
-3. Repository hinzufügen:
-   https://github.com/matkoeout/link_solarprognose_de
-4. Kategorie: Integration
-5. Integration installieren
-6. Home Assistant neu starten
+THIS SOFTWARE IS PROVIDED **WITHOUT ANY WARRANTY**.
 
----
+USE AT **YOUR OWN RISK**.
 
-### Manuelle Installation
+THE AUTHOR ASSUMES **NO LIABILITY** FOR:
+- INCORRECT, INCOMPLETE OR OUTDATED FORECAST DATA
+- FINANCIAL LOSSES, LOST PROFITS OR WRONG DECISIONS
+- MALFUNCTIONS, FAILURES OR DATA LOSS
+- DAMAGE TO HARDWARE, SOFTWARE OR PV SYSTEMS
+- CONSEQUENTIAL DAMAGES OF ANY KIND
 
-1. Ordner
-   custom_components/link_solarprognose_de
-   nach
-   config/custom_components/
-   kopieren
-2. Home Assistant neu starten
+IN PARTICULAR, THE CALCULATED FORECAST VALUES ARE **NOT** SUITABLE FOR:
+- BILLING PURPOSES
+- WARRANTY OR GUARANTEE PURPOSES
+- CONTRACTUAL OR LEGAL DECISIONS
+- CRITICAL CONTROLS
 
----
-
-## Konfiguration
-
-Die Konfiguration erfolgt vollständig über die Benutzeroberfläche von Home Assistant.
-
-### Integration hinzufügen
-
-Einstellungen → Geräte & Dienste → Integration hinzufügen → Solarprognose.de (Community)
-
-### Zugangsdaten
-
-Erforderlich ist mindestens eine der folgenden Angaben:
-
-- API-Key von Solarprognose.de
-- Vollständige API-URL
-
-Ohne gültige Zugangsdaten ist kein Betrieb möglich.
+BY INSTALLING AND USING THIS INTEGRATION, YOU EXPRESSLY AGREE TO THESE TERMS.
 
 ---
 
-## Optionen
+### Description
+This custom integration connects the Solarprognose.de WebAPI to Home Assistant. This is an **unofficial community integration** and has no affiliation with the operators of Solarprognose.de.
 
-API-Key oder API-URL können jederzeit unter den Integrationsoptionen geändert werden. Die Integration wird danach automatisch neu geladen.
+### 🔑 How to get API Access
+1. Register at [Solarprognose.de](https://www.solarprognose.de).
+2. Go to **"System Settings"** (Anlageneinstellungen) and create your PV system.
+3. Navigate to **"User Settings"** -> **"API / Interface"**.
+4. Copy your **API Key** or the full **API URL**.
 
----
+### Installation via HACS (Recommended)
+[![Open your Home Assistant instance and open a repository window in HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=matkoeout&repository=link_solarprognose_de&category=Integration)
 
-## Sensoren
+1. Click the button above.
+2. Manual: Open **HACS** -> **Integrations** -> Three dots -> **Custom repositories**.
+3. URL: `https://github.com/matkoeout/link_solarprognose_de` | Category: **Integration**.
+4. Click **Download** and restart Home Assistant.
 
-### Energie
+### Sensors
+* **Energy:** Today Total, Tomorrow Total, Remaining Day, Forecast (kWh)
+* **Power:** Current Hour, Next Hour (W)
+* **Status:** API Status, API Requests Today, Last/Next Update
 
-- Heute Gesamt (kWh)
-- Morgen Gesamt (kWh)
-- Resttag (kWh)
-- Prognose (kWh)
-
----
-
-### Leistung
-
-- Aktuelle Stunde (W)
-- Nächste Stunde (W)
-
----
-
-### Status
-
-- API Status
-- API Abfragen heute
-- Letzte erfolgreiche Abfrage
-- Nächste erlaubte Abfragezeit
-
----
-
-## Update-Intervall
-
-Standardmäßig erfolgt eine Aktualisierung alle 150 Minuten unter Berücksichtigung der von der API vorgegebenen Abfragezeit.
-
----
-
-## Kompatibilität
-
-- Home Assistant Version 2023.6 oder neuer
-- Config Flow Unterstützung
-- HACS-kompatibel
-
----
-
-## Lizenz
-
+### License
 MIT License.
-
----
-
-## Schlussbestimmung
-
-DER AUTOR KANN DIE FUNKTION DER SOFTWARE JEDERZEIT ÄNDERN ODER EINSTELLEN.
-ES BESTEHT KEIN ANSPRUCH AUF SUPPORT, WARTUNG ODER WEITERENTWICKLUNG.
-
