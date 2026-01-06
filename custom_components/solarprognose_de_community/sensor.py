@@ -27,7 +27,7 @@ DOMAIN = "solarprognose_de_community"
 
 @dataclass(frozen=True)
 class SolarSensorEntityDescription(SensorEntityDescription):
-    """Eigene Beschreibungsklasse f¸r Solar-Sensoren."""
+    """Eigene Beschreibungsklasse f√ºr Solar-Sensoren."""
     value_fn: Callable[[Any], Any] = None
     attr_fn: Callable[[Any], dict[str, Any]] = None
 
@@ -171,7 +171,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
     )
 
 class SolarSensor(CoordinatorEntity, RestoreEntity, SensorEntity):
-    """Zentrale Sensorklasse f¸r alle Solarprognose-Entit‰ten."""
+    """Zentrale Sensorklasse f√ºr alle Solarprognose-Entit√§ten."""
     
     entity_description: SolarSensorEntityDescription
     _attr_has_entity_name = True
@@ -188,7 +188,7 @@ class SolarSensor(CoordinatorEntity, RestoreEntity, SensorEntity):
         }
 
     async def async_added_to_hass(self) -> None:
-        """Wird aufgerufen, wenn die Entit‰t zu HA hinzugef¸gt wird."""
+        """Wird aufgerufen, wenn die Entit√§t zu HA hinzugef√ºgt wird."""
         await super().async_added_to_hass()
         
         if self.entity_description.key == "api_count":
@@ -204,7 +204,7 @@ class SolarSensor(CoordinatorEntity, RestoreEntity, SensorEntity):
 
     @property
     def extra_state_attributes(self):
-        """Zus‰tzliche Attribute."""
+        """Zus√§tzliche Attribute."""
         if self.entity_description.attr_fn:
             return self.entity_description.attr_fn(self.coordinator)
         return None
