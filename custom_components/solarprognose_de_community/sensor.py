@@ -27,7 +27,7 @@ DOMAIN = "solarprognose_de_community"
 
 @dataclass(frozen=True)
 class SolarSensorEntityDescription(SensorEntityDescription):
-    """Eigene Beschreibungsklasse für Solar-Sensoren."""
+    """Eigene Beschreibungsklasse fuer Solar-Sensoren."""
     value_fn: Callable[[Any], Any] = None
     attr_fn: Callable[[Any], dict[str, Any]] = None
 
