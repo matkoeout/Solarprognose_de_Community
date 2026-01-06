@@ -84,6 +84,23 @@ cards:
           return entity.attributes.forecast.map((entry) => {
             return [new Date(entry.datetime).getTime(), entry.energy];
           });
+  - type: vertical-stack
+    cards:
+      - type: heading
+        heading: Vorhersage & API
+      - type: entities
+        entities:
+          - entity: sensor.solarprognose_morgen_gesamt
+            secondary_info: last-updated
+          - type: divider
+          - entity: sensor.solarprognose_api_status
+            name: API Status
+          - entity: sensor.solarprognose_api_abfragen_heute
+            name: API Aufrufe (Counter)
+          - entity: sensor.solarprognose_letzte_abfrage
+            name: Letzter Abruf
+          - entity: sensor.solarprognose_nachste_abfragezeit
+            name: Nächster geplanter Abruf
 ```
 
 ### Sensoren
@@ -160,7 +177,7 @@ To display the hourly forecast, the ApexCharts-Card is required. You can install
 type: vertical-stack
 cards:
   - type: entities
-    title: Solarvorhersage
+    title: Solarforecast
     entities:
       - entity: sensor.solarprognose_today_total
       - entity: sensor.solarprognose_current_hour
@@ -172,6 +189,23 @@ cards:
           return entity.attributes.forecast.map((entry) => {
             return [new Date(entry.datetime).getTime(), entry.energy];
           });
+  - type: vertical-stack
+    cards:
+      - type: heading
+        heading: Forecast & API
+      - type: entities
+        entities:
+          - entity: sensor.solarprognose_morgen_gesamt
+            secondary_info: last-updated
+          - type: divider
+          - entity: sensor.solarprognose_api_status
+            name: API status
+          - entity: sensor.solarprognose_api_abfragen_heute
+            name: API calls (Counter)
+          - entity: sensor.solarprognose_letzte_abfrage
+            name: Last call Abruf
+          - entity: sensor.solarprognose_nachste_abfragezeit
+            name: next call
 ```
 
 ### Sensors
