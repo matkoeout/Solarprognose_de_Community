@@ -10,9 +10,6 @@ from homeassistant.exceptions import ConfigEntryNotReady
 # 1. Zuerst den Coordinator importieren (Kern-Logik)
 from .sensor import SolarPrognoseCoordinator
 
-# 2. Dann die Dashboard-Strategie importieren
-from .dashboard import SolarPrognoseDashboardStrategy 
-
 _LOGGER = logging.getLogger(__name__)
 
 DOMAIN = "solarprognose_de_community"
