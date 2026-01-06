@@ -42,22 +42,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         "coordinator": coordinator,
     }
 
-    # --- Strategie-Registrierung ---
-    if "lovelace" in hass.config.components:
-        try:
-            # Versuch 1: Moderner Pfad (HA 2024.12+)
-            from homeassistant.components.lovelace.dashboard import async_register_strategy
-            async_register_strategy(hass, DOMAIN, "view", SolarPrognoseDashboardStrategy)
-            _LOGGER.info("Solarprognose Strategie registriert (Pfad: dashboard)")
-        except (ImportError, AttributeError):
-            try:
-                # Versuch 2: Alternativer Pfad
-                from homeassistant.components.lovelace import async_register_strategy
-                async_register_strategy(hass, DOMAIN, "view", SolarPrognoseDashboardStrategy)
-                _LOGGER.info("Solarprognose Strategie registriert (Pfad: lovelace)")
-            except Exception as err:
-                _LOGGER.error("Registrierung fehlgeschlagen: %s", err)
-
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(update_listener))
 
