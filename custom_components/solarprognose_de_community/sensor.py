@@ -157,7 +157,7 @@ class SolarSensor(CoordinatorEntity, RestoreEntity, SensorEntity):
         }
 
     async def async_added_to_hass(self) -> None:
-        """Wird aufgerufen, wenn die Entitaet hinzugefügt wird."""
+        """Wird aufgerufen, wenn die Entitaet hinzugefuegt wird."""
         await super().async_added_to_hass()
         
         # Verhindert, dass der api_count nach einem HA-Neustart bei 0 beginnt, 
@@ -174,7 +174,7 @@ class SolarSensor(CoordinatorEntity, RestoreEntity, SensorEntity):
 
     @property
     def native_value(self):
-        """Gibt den aktuellen Status des Sensors zurück."""
+        """Gibt den aktuellen Status des Sensors zurueck."""
         # Verhindert Fehlermeldungen im Log, wenn noch keine Daten vom Coordinator vorliegen
         if not self.coordinator.data and self.entity_description.key not in ["api_count", "api_status"]:
             return None
@@ -182,5 +182,5 @@ class SolarSensor(CoordinatorEntity, RestoreEntity, SensorEntity):
 
     @property
     def extra_state_attributes(self):
-        """Gibt zusätzliche Attribute zurück (z.B. Forecast-Liste)."""
+        """Gibt zusaetzliche Attribute zurueck (z.B. Forecast-Liste)."""
         return self.entity_description.attr_fn(self.coordinator) if self.entity_description.attr_fn else None

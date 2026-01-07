@@ -33,7 +33,7 @@ class SolarPrognoseCoordinator(DataUpdateCoordinator):
         """Daten von der API abrufen und verarbeiten."""
         now = dt_util.now()
         
-        # API-Zähler bei Datumswechsel zurücksetzen
+        # API-Zähler bei Datumswechsel zuruecksetzen
         if now.date() > self.last_reset_day:
             self.api_count_today = 0
             self.last_reset_day = now.date()
@@ -53,7 +53,7 @@ class SolarPrognoseCoordinator(DataUpdateCoordinator):
 
                     self.last_api_success = now
                     
-                    # Empfehlung der API für den nächsten optimalen Abrufzeitpunkt speichern
+                    # Empfehlung der API für den naechsten optimalen Abrufzeitpunkt speichern
                     if next_req := res.get("preferredNextApiRequestAt"):
                         self.next_api_request = dt_util.as_local(
                             dt_util.utc_from_timestamp(int(next_req["epochTimeUtc"]))
