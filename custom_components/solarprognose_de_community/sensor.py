@@ -57,7 +57,7 @@ SENSOR_TYPES: tuple[SolarSensorEntityDescription, ...] = (
         translation_key="current_hour",
         device_class=SensorDeviceClass.POWER,
         native_unit_of_measurement=UnitOfPower.WATT,
-        state_class=SensorStateClass.TOTAL,
+        state_class=SensorStateClass.MEASUREMENT,
         value_fn=lambda coord: int((coord.data or {}).get(
             dt_util.now().replace(minute=0, second=0, microsecond=0), 0) * 1000),
     ),
@@ -66,7 +66,7 @@ SENSOR_TYPES: tuple[SolarSensorEntityDescription, ...] = (
         translation_key="next_hour",
         device_class=SensorDeviceClass.POWER,
         native_unit_of_measurement=UnitOfPower.WATT,
-        state_class=SensorStateClass.TOTAL,
+        state_class=SensorStateClass.MEASUREMENT,
         value_fn=lambda coord: int((coord.data or {}).get(
             (dt_util.now() + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0), 0) * 1000),
     ),
