@@ -16,6 +16,7 @@
       "missing_api": "Eingabe erforderlich.",
       "cannot_connect": "Server nicht erreichbar.",
       "invalid_auth": "Key ungültig oder abgelaufen.",
+      "api_limit": "API-Limit erreicht. Bitte morgen wieder versuchen.",
       "unknown": "Fehler beim Test-Aufruf."
     }
   },
@@ -34,6 +35,7 @@
       "missing_api": "Eingabe erforderlich.",
       "cannot_connect": "Server nicht erreichbar.",
       "invalid_auth": "Key ungültig oder abgelaufen.",
+      "api_limit": "API-Limit erreicht. Bitte morgen wieder versuchen.",
       "unknown": "Fehler beim Test-Aufruf."
     }
   },
