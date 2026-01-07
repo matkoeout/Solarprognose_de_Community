@@ -207,7 +207,7 @@ class SolarSensor(CoordinatorEntity, RestoreEntity, SensorEntity):
         self._attr_device_info = {
             "identifiers": {(DOMAIN, entry.entry_id)},
             "name": custom_name,
-            "manufacturer": "Solarprognose.de",
+            "manufacturer": "Solarprognose.de (Community)",
             "model": "WebAPI v1",
         }
 
