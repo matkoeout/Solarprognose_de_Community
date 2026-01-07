@@ -50,7 +50,7 @@ Diese Custom Integration bindet die WebAPI von Solarprognose.de ein. Es handelt 
 6. Suche nach "Solarprognose.de (Community)" und installiere sie.
 7. Starte Home Assistant neu.
 
-### manuelle Installation
+### Manuelle Installation
 1. Kopiere den Ordner `custom_components/solarprognose_de_community` in den lokalen `config/custom_components/` Ordner.
 2. Home Assistant neu starten.
 
