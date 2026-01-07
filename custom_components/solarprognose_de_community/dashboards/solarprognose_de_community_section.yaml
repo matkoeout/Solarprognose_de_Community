@@ -6,28 +6,22 @@ views:
       - icon: mdi:solar-power
         cards:
           - type: heading
-            heading: Leistung & Prognose
+            icon: ''
+            heading: Aktuelle Prognose
+            heading_style: title
           - type: vertical-stack
             cards:
-              - type: grid
-                columns: 2
-                square: false
-                cards:
-                  - type: entity
-                    entity: sensor.solarprognose_aktuelle_stunde
-                    name: Aktuelle Stunde
-                  - type: entity
-                    entity: sensor.solarprognose_nachste_stunde
-                    name: Nächste Stunde
-                  - type: entity
-                    entity: sensor.solarprognose_heute_gesamt
-                    name: Prognose Heute
-                  - type: entity
-                    entity: sensor.solarprognose_resttag
-                    name: Verbleibend Heute
               - type: entities
-                title: Peak-Werte Heute
                 entities:
+                  - entity: sensor.solarprognose_aktuelle_stunde
+                    name: Aktuelle Stunde
+                  - entity: sensor.solarprognose_nachste_stunde
+                    name: Nächste Stunde
+                  - type: divider
+                  - entity: sensor.solarprognose_heute_gesamt
+                    name: Prognose Heute
+                  - entity: sensor.solarprognose_resttag
+                    name: Verbleibend Heute
                   - entity: sensor.solarprognose_spitzenleistung_heute
                     name: Max. Leistung
                     icon: mdi:summit
@@ -71,6 +65,7 @@ views:
                     name: Max. Leistung Morgen
                     icon: mdi:weather-sunny-alert
                   - entity: sensor.power_highest_peak_time_tomorrow
+                    format: datetime
                     name: Um Uhrzeit
                   - type: divider
                   - entity: sensor.solarprognose_api_status
