@@ -19,7 +19,7 @@ async def async_get_config_entry_diagnostics(
     """Gibt Diagnoseinformationen zurueck und maskiert dabei Geheimnisse."""
     coordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
     
-    # Konfigurationsdaten schw‰rzen
+    # Konfigurationsdaten schw√§rzen
     diag_data = async_redact_data(entry.as_dict(), TO_REDACT)
     
     # Zusaetzlicher Schutz: Falls der Key in der URL steckt, diesen Teil in der Diagnose-URL maskieren
