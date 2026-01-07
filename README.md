@@ -38,14 +38,8 @@ Diese Custom Integration bindet die WebAPI von Solarprognose.de ein. Es handelt 
 
 > **Hinweis:** Diese Integration ist nicht Teil des offiziellen Home Assistant Core.
 
-Diese Integration wird über **HACS (Home Assistant Community Store)** bereitgestellt und bietet folgende Vorteile:
-
-- Einfache Installation
-- Automatische Update-Hinweise
-- Vertrauenswürdige Plattform
-
-Weitere Informationen zur Installation findest du hier:  
-[HACS – Download & Installation](https://www.hacs.xyz/docs/use/download/download/)
+1. Diese Integration wird über **HACS (Home Assistant Community Store)** bereitgestellt und bietet folgende Vorteile einfache Installation, automatische Update-Hinweise, vertrauenswürdige Plattform
+2. Weitere Informationen zur Installation findest du hier:  [HACS – Download & Installation](https://www.hacs.xyz/docs/use/download/download/)
 
 ### Installation via HACS (Empfohlen)
 1. Öffne **HACS** in Home Assistant.
@@ -157,14 +151,8 @@ This custom integration connects the Solarprognose.de WebAPI to Home Assistant. 
 
 > **Note:** This integration is not part of the official Home Assistant Core.
 
-This integration is distributed via **HACS (Home Assistant Community Store)** and provides the following benefits:
-
-- Easy installation
-- Update notifications
-- Trusted distribution platform
-
-Please follow the instructions in the official HACS documentation:  
-[HACS – Download & Installation](https://www.hacs.xyz/docs/use/download/download/)
+1. This integration is distributed via **HACS (Home Assistant Community Store)** and provides the following benefits easy installation, update notifications, trusted distribution platform.
+2. Please follow the instructions in the official HACS documentation:  [HACS – Download & Installation](https://www.hacs.xyz/docs/use/download/download/)
 
 ### Installation via HACS (Recommended)
 1. Open **HACS** in Home Assistant.
