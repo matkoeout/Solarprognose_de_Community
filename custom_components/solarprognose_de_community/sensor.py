@@ -55,7 +55,6 @@ class SolarPrognoseCoordinator(DataUpdateCoordinator):
             async with async_timeout.timeout(20):
                 session = async_get_clientsession(self.hass)
                 async with session.get(self.api_url) as response:
-                    self.api_count_today += 1
                     res = await response.json()
                     self.api_status = res.get("status")
                     self.api_message = res.get("message", "")
@@ -75,6 +74,7 @@ class SolarPrognoseCoordinator(DataUpdateCoordinator):
                     for ts, v in res.get("data", {}).items():
                         local_dt = dt_util.as_local(dt_util.utc_from_timestamp(int(ts)))
                         processed_data[local_dt] = float(v[0])
+                    self.api_count_today += 1
                     return processed_data
 
         except Exception as err:
@@ -212,10 +212,28 @@ class SolarSensor(CoordinatorEntity, RestoreEntity, SensorEntity):
         }
 
     async def async_added_to_hass(self) -> None:
+        """Wird aufgerufen, wenn die Entität zu HA hinzugefügt wird."""
         await super().async_added_to_hass()
+        
+        # Wir stellen den Wert nur für den api_count Sensor wieder her
         if self.entity_description.key == "api_count":
-            if (last_state := await self.async_get_last_state()) and last_state.state.isdigit():
-                self.coordinator.api_count_today = int(last_state.state)
+            last_state = await self.async_get_last_state()
+            if last_state and last_state.state not in (None, "unknown", "unavailable"):
+                try:
+                    restored_count = int(last_state.state)
+                    
+                    # WICHTIG: Wir setzen den Wert auf das Maximum aus (Wiederhergestellt vs. Aktuell)
+                    # Das verhindert Doppelt-Zählungen und berücksichtigt den ersten Call beim Start.
+                    if restored_count > self.coordinator.api_count_today:
+                        _LOGGER.debug(
+                            "API Count von %s auf %s korrigiert", 
+                            self.coordinator.api_count_today, 
+                            restored_count
+                        )
+                        self.coordinator.api_count_today = restored_count
+                        
+                except ValueError:
+                    _LOGGER.error("Konnte API Count nicht wiederherstellen: %s", last_state.state)
 
     @property
     def native_value(self):
