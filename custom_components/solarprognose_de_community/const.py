@@ -1,0 +1,1 @@
+DOMAIN = "solarprognose_de_community"

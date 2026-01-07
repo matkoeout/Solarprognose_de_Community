@@ -8,7 +8,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.components.diagnostics import async_redact_data
 
-from .sensor import DOMAIN
+from .const import DOMAIN
 
 # Felder, die direkt im Dictionary geschwärzt werden
 TO_REDACT = {"api_key", "access-token", "api_url"}

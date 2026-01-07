@@ -4,11 +4,10 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
-
-from .sensor import SolarPrognoseCoordinator
+from .coordinator import SolarPrognoseCoordinator
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
-DOMAIN = "solarprognose_de_community"
 PLATFORMS: list[Platform] = [Platform.SENSOR]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

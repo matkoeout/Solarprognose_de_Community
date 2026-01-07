@@ -1,5 +1,6 @@
 import logging
 import async_timeout
+
 from datetime import timedelta
 from dataclasses import dataclass
 from typing import Callable, Any
@@ -21,8 +22,10 @@ from homeassistant.helpers.update_coordinator import (
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.util import dt as dt_util
 
+from .coordinator import SolarPrognoseCoordinator
+from .const import DOMAIN
+
 _LOGGER = logging.getLogger(__name__)
-DOMAIN = "solarprognose_de_community"
 
 @dataclass(frozen=True)
 class SolarSensorEntityDescription(SensorEntityDescription):

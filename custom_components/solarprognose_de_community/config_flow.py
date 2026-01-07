@@ -5,8 +5,7 @@ from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-
-DOMAIN = "solarprognose_de_community"
+from .const import DOMAIN
 
 async def validate_input(hass, data):
     api_key = data.get("api_key")
