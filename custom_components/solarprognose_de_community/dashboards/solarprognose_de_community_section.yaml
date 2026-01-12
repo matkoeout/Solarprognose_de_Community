@@ -29,7 +29,7 @@ views:
                     name: Um Uhrzeit
                     format: time
           - type: custom:apexcharts-card
-            graph_span: 22h
+            graph_span: 40h
             span:
               start: day
             now:

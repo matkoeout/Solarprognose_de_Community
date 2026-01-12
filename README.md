@@ -30,7 +30,8 @@ MIT DER INSTALLATION UND NUTZUNG DIESER INTEGRATION ERKLÄRST DU DICH AUSDRÜCKL
 Diese Custom Integration bindet die WebAPI von Solarprognose.de ein. Es handelt sich um eine **nicht-offizielle Community-Integration**. Es besteht **keine Verbindung** zum Betreiber von Solarprognose.de.
 
 ### Funktionsumfang
-- Prognose Heute / Morgen / Resttag
+- Prognose Heute / Morgen / Resttag / Zeitpunkt der Spitzenleistung heute und morgen
+- Einbindung in das Energiedashboard
 - Leistung aktuelle & nächste Stunde
 - API-Status & Abfragezähler
 
@@ -109,8 +110,8 @@ cards:
           - entity: sensor.solarprognose_nachste_abfragezeit
             name: Nächster geplanter Abruf
 ```
-### Sampledashboard in mobile app
-[Sceenshot](#-screenshot)
+### Sampledashboards
+[Screenshot](#-screenshot)
 
 ### Sensoren
 * **Energie:** today_total, tomorrow_total, rest_day, forecast, current_hour, next_hour
@@ -144,7 +145,8 @@ BY INSTALLING AND USING THIS INTEGRATION, YOU EXPRESSLY AGREE TO THESE TERMS.
 This custom integration connects the Solarprognose.de WebAPI to Home Assistant. This is an **unofficial community integration** and has no affiliation with the operators of Solarprognose.de.
 
 ### Features
-- Forecast Today / Tomorrow / Remaining Day
+- Forecast Today / Tomorrow / Remaining Day / time for peakpower today and tomorrow
+- Supporting the energy dashboard
 - Power Current & Next Hour
 - API Status & Request Counter
 - Next update time tracking
@@ -232,6 +234,9 @@ cards:
 MIT License.
 
 <a name="-screenshot"></a>
-### Sampledashboard in mobile app
+### Sampledashboards
 
-![sample dashboard](images/solarpprognose_de_dashboard_sample.png)
+![sample desktop dashboard](images/solarpprognose_de_dashboard_sample_desktop.png)
+![sample energy dashboard](images/energy-dashboard.png)
+![sample mobile dashboard](images/solarpprognose_de_dashboard_sample.png)
+	
