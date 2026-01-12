@@ -133,8 +133,18 @@ SENSOR_TYPES: tuple[SolarSensorEntityDescription, ...] = (
         value_fn=lambda coord: "OK" if coord.api_status == 0 else "Fehler",
         attr_fn=lambda coord: {"api_message": coord.api_message},
     ),
-    SolarSensorEntityDescription(key="next_update", translation_key="next_update", device_class=SensorDeviceClass.TIMESTAMP, value_fn=lambda coord: coord.next_api_request),
-    SolarSensorEntityDescription(key="last_update", translation_key="last_update", device_class=SensorDeviceClass.TIMESTAMP, value_fn=lambda coord: coord.last_api_success),
+    SolarSensorEntityDescription(
+        key="next_update", 
+        translation_key="next_update", 
+        device_class=SensorDeviceClass.TIMESTAMP, 
+        value_fn=lambda coord: coord.next_api_request 
+    ),
+    SolarSensorEntityDescription(
+        key="last_update", 
+        translation_key="last_update", 
+        device_class=SensorDeviceClass.TIMESTAMP, 
+        value_fn=lambda coord: coord.last_api_success
+    ),
 )
 
 async def async_setup_entry(hass, entry, async_add_entities):
