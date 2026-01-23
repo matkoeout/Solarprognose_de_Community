@@ -51,6 +51,9 @@ Diese Custom Integration bindet die WebAPI von Solarprognose.de ein. Es handelt 
 6. Suche nach "Solarprognose.de (Community)" und installiere sie.
 7. Starte Home Assistant neu.
 
+   
+<a href="https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fmatkoeout%2FSolarprognose_de_Community" target="_blank" rel="noreferrer noopener"><img src="https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg" alt="Open your Home Assistant instance and show the add add-on repository dialog with a specific repository URL pre-filled." /></a>
+
 ### Manuelle Installation
 1. Kopiere den Ordner `custom_components/solarprognose_de_community` in den lokalen `config/custom_components/` Ordner.
 2. Home Assistant neu starten.
@@ -166,6 +169,8 @@ This custom integration connects the Solarprognose.de WebAPI to Home Assistant. 
 5. Select **Integration** as the category.
 6. Search for "Solarprognose.de (Community)" and install it.
 7. Restart Home Assistant.
+   
+<a href="https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fmatkoeout%2FSolarprognose_de_Community" target="_blank" rel="noreferrer noopener"><img src="https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg" alt="Open your Home Assistant instance and show the add add-on repository dialog with a specific repository URL pre-filled." /></a>
 
 ### Manual Installation
 1. Copy the folder `custom_components/solarprognose_de_community` to your `config/custom_components/` directory.
