@@ -19,8 +19,7 @@ class SolarPrognoseCoordinator(DataUpdateCoordinator):
             f"?access-token={api_key}&type=hourly&_format=json"
         )
         
-        # 150 Minuten Intervall entspricht ca. 10 Abfragen/Tag (Sicherheitspuffer für das 12er Limit)
-        super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=timedelta(minutes=150))
+        super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=None)
         
         self.api_status = None
         self.api_message = ""
@@ -48,17 +47,24 @@ class SolarPrognoseCoordinator(DataUpdateCoordinator):
                     
                     # Status 0 bedeutet bei Solarprognose.de "Erfolg"
                     if self.api_status != 0:
-                        _LOGGER.error("Solarprognose API Fehler: %s", self.api_message)
+                        _LOGGER.warning("API Fehler: %s. Versuche es in 60 Min erneut.", self.api_message)
+                        self._schedule_next_update(timedelta(minutes=60))
                         return self.data or {}
 
                     self.last_api_success = now
                     
                     # Empfehlung der API für den naechsten optimalen Abrufzeitpunkt speichern
+                    delay = timedelta(minutes=150) # Default
                     if next_req := res.get("preferredNextApiRequestAt"):
                         ts_seconds = int(next_req.get("epochTimeUtc", 0))
                         if ts_seconds > 0:
                             self.next_api_request = dt_util.utc_from_timestamp(ts_seconds)
+                            # Berechne Sekunden bis zum Zielzeitpunkt (mind. 1 Minute in der Zukunft)
+                            seconds_to_wait = (self.next_api_request - dt_util.utcnow()).total_seconds()
+                            delay = timedelta(seconds=max(60, seconds_to_wait))
                     
+                    self._schedule_next_update(delay)
+
                     # Rohdaten (Timestamps) in lokale Datetime-Objekte umwandeln
                     processed_data = {}
                     for ts, v in res.get("data", {}).items():
@@ -69,4 +75,17 @@ class SolarPrognoseCoordinator(DataUpdateCoordinator):
                     return processed_data
 
         except Exception as err:
+            # BEI VERBINDUNGSFEHLER: In 60 Minuten erneut versuchen
+            _LOGGER.error("Verbindungsfehler: %s. Retry in 60 Min.", err)
+            self._schedule_next_update(timedelta(minutes=60))
             raise UpdateFailed(f"Verbindungsfehler zur API: {err}") from err
+
+    def _schedule_next_update(self, delay: timedelta):
+        """Plant das naechste Update."""
+        _LOGGER.debug("Naechstes Update geplant in: %s", delay)
+        self.hass.loop.call_later(
+            delay.total_seconds(), 
+            lambda: self.hass.async_create_task(self.async_refresh())
+        )
+    def set_api_count(self, count: int):
+        self.api_count_today = count

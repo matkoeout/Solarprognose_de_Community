@@ -49,8 +49,11 @@ SENSOR_TYPES: tuple[SolarSensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL,
-        value_fn=lambda coord: round(sum(val for dt, val in (coord.data or {}).items() 
-            if dt >= dt_util.now() and dt.date() == dt_util.now().date()), 2),
+        # Verhindert Fehler, falls dt_util.now() exakt zwischen zwei Timestamps liegt
+        value_fn=lambda coord: round(sum(
+            val for dt, val in (coord.data or {}).items() 
+            if dt.date() == dt_util.now().date() and dt >= dt_util.now().replace(minute=0, second=0, microsecond=0)
+        ), 2),
     ),
     SolarSensorEntityDescription(
         key="current_hour",
@@ -178,7 +181,7 @@ class SolarSensor(CoordinatorEntity, RestoreEntity, SensorEntity):
                 try:
                     restored_count = int(last_state.state)
                     if restored_count > self.coordinator.api_count_today:
-                        self.coordinator.api_count_today = restored_count
+                        self.coordinator.set_api_count(restored_count)
                 except ValueError:
                     _LOGGER.error("Konnte API Count nicht wiederherstellen: %s", last_state.state)
 

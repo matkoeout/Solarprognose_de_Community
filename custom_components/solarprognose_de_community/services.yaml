@@ -1,0 +1,7 @@
+# services.yaml
+update:
+  name: Prognose aktualisieren
+  description: Ruft die neuesten Daten ab.
+  target:
+    device:
+      integration: solarprognose_de_community
