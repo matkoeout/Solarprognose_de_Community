@@ -4,6 +4,8 @@ from datetime import timedelta
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.util import dt as dt_util
+from homeassistant.helpers.event import async_call_later
+from homeassistant.core import callback, HomeAssistant
 
 from .const import DOMAIN
 
@@ -12,7 +14,7 @@ _LOGGER = logging.getLogger(__name__)
 class SolarPrognoseCoordinator(DataUpdateCoordinator):
     """Zentrale Instanz zum Abrufen und Aufbereiten der Prognosedaten."""
     
-    def __init__(self, hass, api_url=None, api_key=None):
+    def __init__(self, hass: HomeAssistant, api_url=None, api_key=None):
         # Falls keine fertige URL geliefert wurde, bauen wir sie aus dem API-Key zusammen
         self.api_url = api_url or (
             "https://www.solarprognose.de/web/solarprediction/api/v1"
@@ -27,6 +29,7 @@ class SolarPrognoseCoordinator(DataUpdateCoordinator):
         self.last_api_success = None
         self.api_count_today = 0
         self.last_reset_day = dt_util.now().date()
+        self._unsub_next_update = None
 
     async def _async_update_data(self):
         """Daten von der API abrufen und verarbeiten."""
@@ -59,7 +62,7 @@ class SolarPrognoseCoordinator(DataUpdateCoordinator):
                         ts_seconds = int(next_req.get("epochTimeUtc", 0))
                         if ts_seconds > 0:
                             self.next_api_request = dt_util.utc_from_timestamp(ts_seconds)
-                            # Berechne Sekunden bis zum Zielzeitpunkt (mind. 1 Minute in der Zukunft)
+                            # Berechne Sekunden bis zum Zielzeitpunkt
                             seconds_to_wait = (self.next_api_request - dt_util.utcnow()).total_seconds()
                             delay = timedelta(seconds=max(60, seconds_to_wait))
                     
@@ -75,17 +78,26 @@ class SolarPrognoseCoordinator(DataUpdateCoordinator):
                     return processed_data
 
         except Exception as err:
-            # BEI VERBINDUNGSFEHLER: In 60 Minuten erneut versuchen
             _LOGGER.error("Verbindungsfehler: %s. Retry in 60 Min.", err)
             self._schedule_next_update(timedelta(minutes=60))
             raise UpdateFailed(f"Verbindungsfehler zur API: {err}") from err
 
     def _schedule_next_update(self, delay: timedelta):
-        """Plant das naechste Update."""
-        _LOGGER.debug("Naechstes Update geplant in: %s", delay)
-        self.hass.loop.call_later(
+        """Plant das naechste Update mit HA-Mitteln."""
+        if self._unsub_next_update:
+            self._unsub_next_update() # Alten Timer abbrechen
+
+        @callback
+        def _fire_refresh(_):
+            """Triggert den asynchronen Refresh über einen Task."""
+            self.hass.async_create_task(self.async_refresh())
+
+        self._unsub_next_update = async_call_later(
+            self.hass, 
             delay.total_seconds(), 
-            lambda: self.hass.async_create_task(self.async_refresh())
+            _fire_refresh
         )
+
     def set_api_count(self, count: int):
+        """Ermoeglicht das Wiederherstellen des Zaehlers aus dem Sensor-Status."""
         self.api_count_today = count

@@ -8,8 +8,10 @@ async def test_coordinator_api_error(hass):
     coordinator = SolarPrognoseCoordinator(hass, api_key="wrong-key")
     error_data = {"status": 1, "message": "Access denied"}
 
-    # Wir mocken direkt die Funktion, die die Session bereitstellt
-    with patch("custom_components.solarprognose_de_community.coordinator.async_get_clientsession") as mock_get_session:
+    # Mocke die API-Session UND das Scheduling
+    with patch("custom_components.solarprognose_de_community.coordinator.async_get_clientsession") as mock_get_session, \
+         patch.object(coordinator, "_schedule_next_update"): # <--- Verhindert den lingering timer
+        
         mock_session = MagicMock()
         mock_get_session.return_value = mock_session
         
@@ -20,7 +22,7 @@ async def test_coordinator_api_error(hass):
         
         mock_session.get.return_value = mock_response
 
-        # Führe Update aus - sollte nun nicht mehr hängen oder DNS brauchen
+        # Führe Update aus
         await coordinator._async_update_data()
         
         assert coordinator.api_status == 1
