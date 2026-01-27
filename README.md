@@ -52,7 +52,7 @@ neu in 1.8.0
 4. Füge die URL hinzu: `https://github.com/matkoeout/solarprognose_de_community`
 5. Wähle als Kategorie **Integration**.
 6. Suche nach "Solarprognose.de (Community)" und installiere sie.
-7. Starte Home Assistant neu.
+7. Starte Home Assistant neu
 
 ### Manuelle Installation
 1. Kopiere den Ordner `custom_components/solarprognose_de_community` in den lokalen `config/custom_components/` Ordner.
