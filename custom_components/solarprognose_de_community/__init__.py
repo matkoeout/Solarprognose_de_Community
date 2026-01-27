@@ -31,18 +31,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # Service-Handler definieren
     async def handle_update_service(call: ServiceCall):
-        """Extrahiert Geräte-IDs oder aktualisiert alle, falls keine ID angegeben wurde."""
+        """Extrahiert Geraete-IDs oder aktualisiert alle, falls keine ID angegeben wurde."""
         device_ids = call.data.get("device_id", [])
         
-        # Falls kein Target/Gerät im Dashboard gewählt wurde: Alles aktualisieren
+        # Falls kein Target/Geraet im Dashboard gewaehlt wurde: Alles aktualisieren
         if not device_ids:
-            _LOGGER.info("Update für alle Solarprognose-Instanzen ausgelöst")
+            _LOGGER.info("Update fuer alle Solarprognose-Instanzen ausgelÃ¶st")
             for data in hass.data[DOMAIN].values():
                 # Korrigiert: async_refresh() statt async_request_refresh()
                 await data["coordinator"].async_refresh()
             return
 
-        # Falls ein Target gewählt wurde: Gezielt filtern
+        # Falls ein Target gewqehlt wurde: Gezielt filtern
         if isinstance(device_ids, str):
             device_ids = [device_ids]
 
@@ -51,7 +51,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             for dev_id in device_ids:
                 device = dev_reg.async_get(dev_id)
                 if device and entry_id in device.config_entries:
-                    _LOGGER.info("Manuelles Update für %s ausgelöst", device.name)
+                    _LOGGER.info("Manuelles Update fuer %s ausgelÃ¶st", device.name)
                     # Korrigiert: async_refresh() statt async_request_refresh()
                     await data["coordinator"].async_refresh()
 
