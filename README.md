@@ -35,6 +35,7 @@ Diese Custom Integration bindet die WebAPI von Solarprognose.de ein. Es handelt 
 - Leistung aktuelle & nächste Stunde
 neu in 1.8.0
 - Dynamische Abfrageintervalle: Nutzt die API-Empfehlung (`preferredNextApiRequestAt`) für optimale Aktualisierungszeiten.
+- Nachtruhe zwischen 21 und 3 Uhr um das API Limit von 20 Abfragen pro Tag nicht zu erreichen
 - Fehlertoleranz: Automatischer Retry nach 60 Minuten bei Verbindungsfehlern.
 - Manueller Update-Service: Sofortige Aktualisierung via Service-Call möglich.
 
@@ -168,6 +169,7 @@ This custom integration connects the Solarprognose.de WebAPI to Home Assistant. 
 - Next update time tracking
 new in 1.8.0
 - Dynamic Update Intervals: Automatically follows API recommendations (preferredNextApiRequestAt).
+- Implement night-time suspension between 9 PM and 3 AM to stay within the API limit of 20 requests per day.
 - Error Handling: Automatic 60-minute retry on connection failures.
 - Manual Update Service: Force updates instantly via service call.
 
