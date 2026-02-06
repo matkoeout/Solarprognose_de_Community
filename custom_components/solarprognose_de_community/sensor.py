@@ -14,7 +14,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.util import dt as dt_util
 
-from .const import DOMAIN
+from .const import DOMAIN, NIGHT_START_HOUR, NIGHT_END_HOUR
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -49,8 +49,11 @@ SENSOR_TYPES: tuple[SolarSensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL,
-        value_fn=lambda coord: round(sum(val for dt, val in (coord.data or {}).items() 
-            if dt >= dt_util.now() and dt.date() == dt_util.now().date()), 2),
+        # Verhindert Fehler, falls dt_util.now() exakt zwischen zwei Timestamps liegt
+        value_fn=lambda coord: round(sum(
+            val for dt, val in (coord.data or {}).items() 
+            if dt.date() == dt_util.now().date() and dt >= dt_util.now().replace(minute=0, second=0, microsecond=0)
+        ), 2),
     ),
     SolarSensorEntityDescription(
         key="current_hour",
@@ -102,7 +105,7 @@ SENSOR_TYPES: tuple[SolarSensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-        # Erzeugt den gleitenden Prognose-Wert für das HA-Energie-Dashboard
+        # Erzeugt den gleitenden Prognose-Wert fuer das HA-Energie-Dashboard
         value_fn=lambda coord: round(sum(val for dt, val in (coord.data or {}).items() 
             if dt.date() == dt_util.now().date() and dt <= dt_util.now()), 2),
         attr_fn=lambda coord: {
@@ -130,7 +133,10 @@ SENSOR_TYPES: tuple[SolarSensorEntityDescription, ...] = (
     SolarSensorEntityDescription(
         key="api_status",
         translation_key="api_status",
-        value_fn=lambda coord: "OK" if coord.api_status == 0 else "Fehler",
+        value_fn=lambda coord: (
+            "Schlafend" if (dt_util.now().hour >= NIGHT_START_HOUR or dt_util.now().hour < NIGHT_END_HOUR) 
+            else ("OK" if coord.api_status == 0 else "Fehler")
+        ),
         attr_fn=lambda coord: {"api_message": coord.api_message},
     ),
     SolarSensorEntityDescription(
@@ -169,28 +175,81 @@ class SolarSensor(CoordinatorEntity, RestoreEntity, SensorEntity):
     async def async_added_to_hass(self) -> None:
         """Wird aufgerufen, wenn die Entitaet hinzugefuegt wird."""
         await super().async_added_to_hass()
-        
-        # Verhindert, dass der api_count nach einem HA-Neustart bei 0 beginnt, 
-        # falls heute bereits Abfragen stattgefunden haben.
-        if self.entity_description.key == "api_count":
-            last_state = await self.async_get_last_state()
-            if last_state and last_state.state not in (None, "unknown", "unavailable"):
+
+        # Letzten Zustand aus der Home Assistant Datenbank laden
+        last_state = await self.async_get_last_state()
+        if not last_state or last_state.state in (None, "unknown", "unavailable"):
+            return
+    
+        try:
+            # 1. API-Zaehler wiederherstellen
+            if self.entity_description.key == "api_count":
+                restored_count = int(last_state.state)
+                if restored_count > self.coordinator.api_count_today:
+                    self.coordinator.set_api_count(restored_count)
+    
+            # 2. Naechsten Abrufzeitpunkt an den Coordinator uebergeben
+            elif self.entity_description.key == "next_update":
+                restored_dt = dt_util.parse_datetime(last_state.state)
+                if restored_dt and restored_dt > dt_util.now():
+                    _LOGGER.info("Wiederhergestellte Abfragezeit uebernommen: %s", restored_dt)
+                    self.coordinator.next_api_request = restored_dt
+    
+            # 3. Zeitpunkt des letzten Erfolgs wiederherstellen
+            elif self.entity_description.key == "last_update":
+                self.coordinator.last_api_success = dt_util.parse_datetime(last_state.state)
+
+            # 4. Prognosedaten (Zeitreihe) aus dem forecast-Sensor rekonstruieren
+            # Dies befuellt den Coordinator, damit alle anderen Sensoren sofort Daten haben
+            elif self.entity_description.key == "forecast":
+                if "forecast" in last_state.attributes:
+                    restored_data = {}
+                    for item in last_state.attributes["forecast"]:
+                        # ISO-String zurueck in datetime Objekt umwandeln
+                        dt = dt_util.parse_datetime(item["datetime"])
+                        if dt:
+                            # Lokalzeit-Objekt sicherstellen
+                            local_dt = dt_util.as_local(dt)
+                            restored_data[local_dt] = float(item["energy"])
+                    
+                    # Nur befuellen, wenn der Coordinator aktuell leer ist
+                    if restored_data and not self.coordinator.data:
+                        _LOGGER.info("Prognosedaten erfolgreich aus Cache wiederhergestellt")
+                        self.coordinator.async_set_updated_data(restored_data)
+
+            # 5. Fuer alle anderen Sensoren (Ertrag/Leistung) den Wert lokal puffern
+            else:
                 try:
-                    restored_count = int(last_state.state)
-                    if restored_count > self.coordinator.api_count_today:
-                        self.coordinator.api_count_today = restored_count
+                    self._attr_native_value = float(last_state.state)
                 except ValueError:
-                    _LOGGER.error("Konnte API Count nicht wiederherstellen: %s", last_state.state)
+                    pass
+    
+        except (ValueError, TypeError) as err:
+            _LOGGER.error("Fehler beim Wiederherstellen von %s: %s", self.entity_description.key, err)
 
     @property
     def native_value(self):
         """Gibt den aktuellen Status des Sensors zurueck."""
-        # Verhindert Fehlermeldungen im Log, wenn noch keine Daten vom Coordinator vorliegen
-        if not self.coordinator.data and self.entity_description.key not in ["api_count", "api_status"]:
-            return None
-        return self.entity_description.value_fn(self.coordinator)
+        # 1. Wenn der Coordinator Daten hat, nutzen wir diese (Normalbetrieb)
+        if self.coordinator.data:
+            return self.entity_description.value_fn(self.coordinator)
+
+        # 2. Wenn der Coordinator leer ist (nach Neustart), 
+        # versuchen wir den alten Zustand des Sensors aus dem Cache zu nutzen.
+        if getattr(self, "_attr_native_value", None) is not None:
+            return self._attr_native_value
+
+        # 3. Fallback fuer administrative Sensoren, die direkt am Coordinator haengen
+        allowed_without_data = ["api_count", "api_status", "next_update", "last_update"]
+        if self.entity_description.key in allowed_without_data:
+            return self.entity_description.value_fn(self.coordinator)
+
+        return None
 
     @property
     def extra_state_attributes(self):
-        """Gibt zusaetzliche Attribute zurueck (z.B. Forecast-Liste)."""
+        """Gibt zusaetzliche Attribute zurueck."""
+        # Attribute nur berechnen, wenn Daten vorhanden sind oder es kein Forecast-Sensor ist
+        if not self.coordinator.data and self.entity_description.key == "forecast":
+            return None
         return self.entity_description.attr_fn(self.coordinator) if self.entity_description.attr_fn else None

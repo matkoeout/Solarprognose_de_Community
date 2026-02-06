@@ -33,7 +33,11 @@ Diese Custom Integration bindet die WebAPI von Solarprognose.de ein. Es handelt 
 - Prognose Heute / Morgen / Resttag / Zeitpunkt der Spitzenleistung heute und morgen
 - Einbindung in das Energiedashboard
 - Leistung aktuelle & nächste Stunde
-- API-Status & Abfragezähler
+neu in 1.8.0
+- Dynamische Abfrageintervalle: Nutzt die API-Empfehlung (`preferredNextApiRequestAt`) für optimale Aktualisierungszeiten.
+- Nachtruhe zwischen 21 und 3 Uhr um das API Limit von 20 Abfragen pro Tag nicht zu erreichen
+- Fehlertoleranz: Automatischer Retry nach 60 Minuten bei Verbindungsfehlern.
+- Manueller Update-Service: Sofortige Aktualisierung via Service-Call möglich.
 
 ### Installation (HACS)
 
@@ -75,15 +79,19 @@ Du kannst die Daten ganz einfach visualisieren. Ein vollständiges Beispiel für
 **Voraussetzung für den Graphen:**
 Für die Anzeige des stündlichen Verlaufs wird die **ApexCharts-Card** benötigt. Diese kannst du ebenfalls über HACS installieren.
 
-**Beispiel für eine einfache Integration:**
+**Beispiel mit manuellem Update-Button:**
 ```yaml
 type: vertical-stack
 cards:
   - type: entities
-    title: Solarvorhersage
+    title: Solarvorhersage & Status
     entities:
       - entity: sensor.solarprognose_today_total
       - entity: sensor.solarprognose_current_hour
+      - entity: sensor.solarprognose_next_hour
+      - entity: sensor.solarprognose_api_status
+      - entity: sensor.solarprognose_letzte_abfrage
+      - entity: sensor.solarprognose_nachste_abfragezeit
   - type: custom:apexcharts-card
     graph_span: 24h
     series:
@@ -109,7 +117,16 @@ cards:
             name: Letzter Abruf
           - entity: sensor.solarprognose_nachste_abfragezeit
             name: Nächster geplanter Abruf
+          - type: divider
+          - type: button
+            name: Daten jetzt manuell abrufen
+            icon: mdi:refresh
+            action_name: Update
+            tap_action:
+              action: call-service
+              service: solarprognose_de_community.solarprognose_update```
 ```
+
 ### Sampledashboards
 [Screenshot](#-screenshot)
 
@@ -150,6 +167,11 @@ This custom integration connects the Solarprognose.de WebAPI to Home Assistant. 
 - Power Current & Next Hour
 - API Status & Request Counter
 - Next update time tracking
+new in 1.8.0
+- Dynamic Update Intervals: Automatically follows API recommendations (preferredNextApiRequestAt).
+- Implement night-time suspension between 9 PM and 3 AM to stay within the API limit of 20 requests per day.
+- Error Handling: Automatic 60-minute retry on connection failures.
+- Manual Update Service: Force updates instantly via service call.
 
 ### Installation (HACS)
 
@@ -195,10 +217,14 @@ To display the hourly forecast, the ApexCharts-Card is required. You can install
 type: vertical-stack
 cards:
   - type: entities
-    title: Solarforecast
+    title: Solarvorhersage & Status
     entities:
       - entity: sensor.solarprognose_today_total
       - entity: sensor.solarprognose_current_hour
+      - entity: sensor.solarprognose_next_hour
+      - entity: sensor.solarprognose_api_status
+      - entity: sensor.solarprognose_letzte_abfrage
+      - entity: sensor.solarprognose_nachste_abfragezeit
   - type: custom:apexcharts-card
     graph_span: 24h
     series:
@@ -210,20 +236,28 @@ cards:
   - type: vertical-stack
     cards:
       - type: heading
-        heading: Forecast & API
+        heading: Vorhersage & API
       - type: entities
         entities:
           - entity: sensor.solarprognose_morgen_gesamt
             secondary_info: last-updated
           - type: divider
           - entity: sensor.solarprognose_api_status
-            name: API status
+            name: API Status
           - entity: sensor.solarprognose_api_abfragen_heute
-            name: API calls (Counter)
+            name: API Aufrufe (Counter)
           - entity: sensor.solarprognose_letzte_abfrage
-            name: Last call Abruf
+            name: Letzter Abruf
           - entity: sensor.solarprognose_nachste_abfragezeit
-            name: next call
+            name: Nächster geplanter Abruf
+          - type: divider
+          - type: button
+            name: Daten jetzt manuell abrufen
+            icon: mdi:refresh
+            action_name: Update
+            tap_action:
+              action: call-service
+              service: solarprognose_de_community.solarprognose_update```
 ```
 
 ### Sensors
