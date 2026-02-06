@@ -37,7 +37,7 @@ class SolarPrognoseCoordinator(DataUpdateCoordinator):
         
         # 1. Prüfen, ob wir uns aktuell in der Nachtruhe befinden
         if now.hour >= NIGHT_START_HOUR or now.hour < NIGHT_END_HOUR:
-            target = now.replace(hour=NIGHT_END_HOUR, minute=0, second=0, microsecond=0)
+            target = now.replace(hour=NIGHT_END_HOUR, minute=5, second=0, microsecond=0)
             if now.hour >= NIGHT_START_HOUR:
                 target += timedelta(days=1)
             
@@ -67,11 +67,36 @@ class SolarPrognoseCoordinator(DataUpdateCoordinator):
         """Daten von der API abrufen und verarbeiten."""
         now = dt_util.now()
         
-        # API-Zähler bei Datumswechsel zuruecksetzen
+        # Damit springt der Sensor in HA um Mitternacht sofort auf 0.
         if now.date() > self.last_reset_day:
             self.api_count_today = 0
             self.last_reset_day = now.date()
+
+        # Wenn es zwischen 21:00 und 03:00 ist, brechen wir hier ab.
+        if now.hour >= NIGHT_START_HOUR or now.hour < NIGHT_END_HOUR:
             
+            # plant das Aufwachen kurz nach 03:00 Uhr (z.B. 03:05)
+            target = now.replace(hour=NIGHT_END_HOUR, minute=5, second=0, microsecond=0)
+            
+            # Falls es jetzt z.B. 22:00 Uhr ist, muss das Ziel morgen sein
+            if now.hour >= NIGHT_START_HOUR:
+                target += timedelta(days=1)
+            
+            # Falls Ziel in der Vergangenheit liegt (Randfall), +1 Tag
+            if target <= now:
+                target += timedelta(days=1)
+                
+            delay = target - now
+            _LOGGER.info("Nachtruhe: reset, aber API pausiert bis %s", target.strftime("%H:%M"))
+            
+            # Update planen, aber KEINE API anfragen
+            self.next_api_request = target
+            self._schedule_next_update(delay)
+            
+            # Wir geben die alten Daten zurück. 
+            # Da sich api_count_today oben geändert hat, wird HA diesen neuen Wert (0) trotzdem anzeigen!
+            return self.data or {}
+
         try:
             async with async_timeout.timeout(20):
                 session = async_get_clientsession(self.hass)
@@ -86,7 +111,7 @@ class SolarPrognoseCoordinator(DataUpdateCoordinator):
                         self._schedule_next_update(timedelta(minutes=60))
                         return self.data or {}
                     # Zähler und Zeitpunkt nur bei OK
-                    if  self.api_status == 0:
+                    if self.api_status == 0:
                         self.api_count_today += 1
                         self.last_api_success = now
 
@@ -105,7 +130,7 @@ class SolarPrognoseCoordinator(DataUpdateCoordinator):
                     
                     if next_planned.hour >= NIGHT_START_HOUR or next_planned.hour < NIGHT_END_HOUR:
                         # Ziel auf heute 03:00 Uhr
-                        target = now.replace(hour=NIGHT_END_HOUR, minute=0, second=0, microsecond=0)
+                        target = now.replace(hour=NIGHT_END_HOUR, minute=5, second=0, microsecond=0)
                         
                         # Wenn es bereits nach 03:00 Uhr ist (also wir sind im Bereich 21:00 - 23:59),
                         # muss das Ziel auf morgen 03:00 Uhr gesetzt werden.
