@@ -38,8 +38,8 @@ async def test_flow_user_error_but_pass(hass, mock_api_client):
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
 
 @pytest.mark.asyncio
-async def test_options_flow(hass):
-    """Optionen Flow."""
+async def test_options_flow(hass, mock_api_client):
+    """Optionen Flow. Nutzt mock_api_client für sauberes Async-Mocking."""
     entry = MockConfigEntry(domain=DOMAIN, data={"api_key": "old"})
     entry.add_to_hass(hass)
     
@@ -52,8 +52,9 @@ async def test_options_flow(hass):
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     
     # Save Step
-    with patch("custom_components.solarprognose_de_community.config_flow.async_get_clientsession"):
-        result2 = await flow.async_step_init(user_input={"api_key": "new"})
+    # Wir nutzen hier automatisch die mock_api_client Fixture aus conftest.py
+    # Kein manuelles 'with patch' mehr nötig!
+    result2 = await flow.async_step_init(user_input={"api_key": "new"})
     
     assert result2["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result2["data"]["api_key"] == "new"
