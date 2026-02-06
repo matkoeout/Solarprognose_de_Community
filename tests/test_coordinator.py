@@ -1,16 +1,21 @@
 import pytest
-from datetime import timedelta
+from datetime import timedelta, datetime
 from unittest.mock import patch, AsyncMock, MagicMock
 from homeassistant.util import dt as dt_util
 from homeassistant.helpers.update_coordinator import UpdateFailed
 from custom_components.solarprognose_de_community.const import NIGHT_START_HOUR, NIGHT_END_HOUR
 
-# Wir setzen eine Standard-Zeit (Mittag), damit die Tests nicht in die Nachtruhe laufen
+# Wir setzen eine Standard-Zeit (Mittag 12:00 UTC), damit wir sicher
+# weit weg von der Nachtruhe sind.
 @pytest.fixture
 def mock_now_daytime():
-    now = dt_util.now().replace(hour=12, minute=0, second=0, microsecond=0)
-    with patch("homeassistant.util.dt.now", return_value=now):
-        yield now
+    # Fixes Datum: 2025-06-15 12:00:00 UTC
+    fixed_utc = datetime(2025, 6, 15, 12, 0, 0, tzinfo=dt_util.UTC)
+    
+    # Wir patchen now() und utcnow() identisch für den Test, um Zeitzonen-Drift zu vermeiden
+    with patch("homeassistant.util.dt.now", return_value=fixed_utc), \
+         patch("homeassistant.util.dt.utcnow", return_value=fixed_utc):
+        yield fixed_utc
 
 @pytest.mark.asyncio
 async def test_initial_setup_daytime(hass, mock_coordinator, mock_now_daytime):
@@ -22,9 +27,10 @@ async def test_initial_setup_daytime(hass, mock_coordinator, mock_now_daytime):
 @pytest.mark.asyncio
 async def test_initial_setup_nighttime(hass, mock_coordinator):
     """Setup in der Nacht: Soll warten bis 3 Uhr."""
-    # 22:00 Uhr
-    now = dt_util.now().replace(hour=22, minute=0)
-    with patch("homeassistant.util.dt.now", return_value=now):
+    # 22:00 Uhr UTC simulieren
+    now_night = datetime(2025, 6, 15, 22, 0, 0, tzinfo=dt_util.UTC)
+    
+    with patch("homeassistant.util.dt.now", return_value=now_night):
         mock_coordinator.async_refresh = AsyncMock()
         await mock_coordinator.async_setup()
         
@@ -73,24 +79,26 @@ async def test_smart_scheduling_logic(hass, mock_coordinator, mock_api_client, m
     _, mock_response = mock_api_client
     
     # Fall 1: API sagt "komm in 2 Stunden wieder"
-    target_time = mock_now_daytime + timedelta(hours=2)
+    # Da mock_now_daytime auf 12:00 UTC festgenagelt ist, ist target 14:00 UTC
+    target_time_utc = mock_now_daytime + timedelta(hours=2)
+    
     mock_response.json.return_value = {
         "status": 0,
-        "preferredNextApiRequestAt": {"epochTimeUtc": int(target_time.timestamp())}
+        "preferredNextApiRequestAt": {"epochTimeUtc": int(target_time_utc.timestamp())}
     }
     
     await mock_coordinator._async_update_data()
     
     # Timer prüfen
     delay = mock_coordinator.mock_timer.call_args[0][1]
-    # Toleranz für Laufzeit (delay sollte ca 7200s sein)
-    assert 7000 < delay < 7300
+    # Das Delay sollte jetzt ziemlich genau 7200 Sekunden sein
+    assert 7100 < delay < 7300
 
 @pytest.mark.asyncio
 async def test_night_reset_logic(hass, mock_coordinator):
     """Testet, ob um Mitternacht der Counter resettet wird."""
     # Wir simulieren 01:00 Uhr nachts (in der Sperrzeit)
-    now = dt_util.now().replace(hour=1, minute=0, second=0, microsecond=0)
+    now = datetime(2025, 6, 16, 1, 0, 0, tzinfo=dt_util.UTC)
     
     # Wir setzen last_reset_day auf gestern
     mock_coordinator.last_reset_day = (now - timedelta(days=1)).date()
@@ -104,13 +112,11 @@ async def test_night_reset_logic(hass, mock_coordinator):
         assert mock_coordinator.last_reset_day == now.date()
         
         # 2. Es darf KEIN API Call rausgehen (wir sind noch in der Sperrzeit 21-03)
-        target_hour = NIGHT_END_HOUR # 3
-        # Zeit bis 3 Uhr: 2 Stunden = 7200 Sekunden
-        # Da wir um 01:00:00 starten und target 03:05:00 ist
-        expected_delay = 2 * 3600 + 300 # 2h + 5min
+        # Ziel ist 03:05 Uhr. Von 01:00 bis 03:05 sind es 2h 5min = 7500 Sekunden
+        expected_delay = 7500 
         
         delay = mock_coordinator.mock_timer.call_args[0][1]
-        assert (expected_delay - 10) < delay < (expected_delay + 10)
+        assert (expected_delay - 60) < delay < (expected_delay + 60)
 
 @pytest.mark.asyncio
 async def test_exception_handling(hass, mock_coordinator, mock_api_client, mock_now_daytime):

@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from custom_components.solarprognose_de_community import async_setup_entry, async_unload_entry
 from custom_components.solarprognose_de_community.const import DOMAIN
 from pytest_homeassistant_custom_component.common import MockConfigEntry

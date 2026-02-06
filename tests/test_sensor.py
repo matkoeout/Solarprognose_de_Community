@@ -25,7 +25,8 @@ def coordinator_with_data(hass):
     coord.data = data
     coord.api_count_today = 5
     coord.api_status = 0
-    # FIX: Setze diese Werte, damit sensoren nicht None liefern
+    
+    # FIX: Setze diese Werte explizit, damit Sensoren nicht None liefern
     coord.next_api_request = now + timedelta(hours=1)
     coord.last_api_success = now - timedelta(hours=1)
     coord.api_message = "OK"
