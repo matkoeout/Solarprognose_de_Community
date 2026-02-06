@@ -10,11 +10,16 @@ async def test_setup_and_unload(hass):
     entry.add_to_hass(hass)
     
     # Setup
+    # WICHTIG: Wir patchen async_call_later, damit kein Timer im Hintergrund bleibt!
     with patch("custom_components.solarprognose_de_community.coordinator.SolarPrognoseCoordinator.async_setup"), \
+         patch("custom_components.solarprognose_de_community.async_call_later") as mock_timer, \
          patch("homeassistant.config_entries.ConfigEntries.async_forward_entry_setups", return_value=True):
         
         assert await async_setup_entry(hass, entry)
         assert DOMAIN in hass.data
+        
+        # Sicherstellen, dass der Timer für das verzögerte Setup gerufen wurde
+        assert mock_timer.called
     
     # Unload
     with patch("homeassistant.config_entries.ConfigEntries.async_unload_platforms", return_value=True):
