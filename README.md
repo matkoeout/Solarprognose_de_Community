@@ -128,6 +128,7 @@ cards:
               service: solarprognose_de_community.solarprognose_update```
 ```
 ### EVCC Anbindung
+Diese Integration dient als intelligenter Puffer: Sie nutzt die vorhandenen Entitäten in Home Assistant, um evcc mit präzisen Daten zu versorgen, während gleichzeitig die API-Zugriffsbeschränkungen von Solarprognose.de eingehalten werden.
 Anleitung: PV-Vorhersage in der evcc UI hinzufügen
 #### Erstellen eine langlaufenden Zugangstokens in HA
 1. Profil öffnen: Klicke in Home Assistant ganz unten links auf deinen Benutzernamen (dein Profil-Icon).
@@ -298,6 +299,7 @@ cards:
 * **Status:** api_status, api_count, last_update, next_update
 
 ### EVCC Integration
+Since the Solarprognose API limits the number of direct requests, this extension allows you to bypass those restrictions by querying the data already available in Home Assistant. By leveraging the data Home Assistant has already fetched, you can provide evcc with high-frequency updates without exceeding your external API quotas.
 Instructions: Adding PV Forecast in the evcc UI
 
 #### Creating a Long-lived Access Token in HA
