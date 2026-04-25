@@ -159,7 +159,8 @@ forecast:
   jq: .attributes.evcc_data
   cache: 1h
 ```
-Speichern: Klicke auf "Speichern". evcc prüft die Verbindung sofort.
+10. Klicke auf "Speichern". evcc prüft die Verbindung sofort. Nach einem Neustart von EVCC werden die Daten dargestellt.
+    
 ### Sampledashboards
 [Screenshot](#-screenshot)
 
@@ -331,6 +332,8 @@ forecast:
   jq: .attributes.evcc_data
   cache: 1h
 ```
+9. **Save:** Click on "Save". evcc will verify the connection immediately. After restarting evcc, the data will be visible.
+    
 ### License
 MIT License.
 
