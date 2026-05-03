@@ -38,6 +38,8 @@ neu in 1.8.0
 - Nachtruhe zwischen 21 und 3 Uhr um das API Limit von 20 Abfragen pro Tag nicht zu erreichen
 - Fehlertoleranz: Automatischer Retry nach 60 Minuten bei Verbindungsfehlern.
 - Manueller Update-Service: Sofortige Aktualisierung via Service-Call möglich.
+neu in 1.9.0
+- Lokale Datenbereitstellung für EVCC
 
 ### Installation (HACS)
 
@@ -126,7 +128,41 @@ cards:
               action: call-service
               service: solarprognose_de_community.solarprognose_update```
 ```
+### EVCC Anbindung
+Diese Integration dient als intelligenter Puffer: Sie nutzt die vorhandenen Entitäten in Home Assistant, um evcc mit präzisen Daten zu versorgen, während gleichzeitig die API-Zugriffsbeschränkungen von Solarprognose.de eingehalten werden.
 
+Anleitung: PV-Vorhersage in der evcc UI hinzufügen
+#### Erstellen eine langlaufenden Zugangstokens in HA
+1. Profil öffnen: Klicke in Home Assistant ganz unten links auf deinen Benutzernamen (dein Profil-Icon).
+2. Sicherheit wählen: Klicke oben in der Mitte auf den Reiter Sicherheit (neben "Allgemein").
+3. Ganz nach unten scrollen: Scrolle auf der Sicherheits-Seite bis ganz nach unten zum Abschnitt Langlebige Zugangs-Token.
+4. Token erstellen: Klicke auf die Schaltfläche Token erstellen.
+5. Namen vergeben: Gib dem Token einen Namen, damit du später weißt, wofür er ist (z. B. evcc-prognose).
+6. Kopieren (Wichtig!): Dir wird jetzt ein sehr langer Code angezeigt. Kopiere diesen sofort und speichere ihn kurz in einem Textdokument zwischen.
+7. Hinweis: Sobald du das Fenster schließt, wird dir der Key nie wieder im Klartext angezeigt. Wenn du ihn verlierst, musst du einen neuen erstellen.1. evcc UI öffnen: Öffne dein evcc Dashboard im Browser (standardmäßig auf Port 7070).
+
+#### Konfigurieren der PV Vorhersage in EVCC
+1. evcc UI öffnen: Öffne dein evcc Dashboard im Browser (standardmäßig auf Port 7070).
+2. Konfiguration aufrufen: Klicke in der Seitenleiste auf Konfiguration (Zahnrad-Symbol).
+3. Tarife & Vorhersagen: Scrolle zum Abschnitt "Tarife & Vorhersagen".
+4. Klicke auf "Hinzufügen"
+5. Klicke auf "Vorhersage hinzufügen".
+6. Wähle "Solarvorhersage hinzufügen".
+7. Gib einen Namen ein (z. B. "Solarprognose HA").
+8. Wähle als Anbieter "Benutzerdefiniert" (Custom).
+9. YAML-Code eintragen: Kopiere den folgenden Block in das Textfeld.
+```yaml
+tariff: solar
+forecast: 
+  source: http
+  uri: "http://<Deine_HA_IP_Oder_URL:8123>/api/states/sensor.solarprognose_prognose"
+  headers:
+    Authorization: "Bearer <Dein_Langlaufender_Zugangs_Token>"
+  jq: .attributes.evcc_data
+  cache: 1h
+```
+10. Klicke auf "Speichern". evcc prüft die Verbindung sofort. Nach einem Neustart von EVCC werden die Daten dargestellt.
+    
 ### Sampledashboards
 [Screenshot](#-screenshot)
 
@@ -172,6 +208,8 @@ new in 1.8.0
 - Implement night-time suspension between 9 PM and 3 AM to stay within the API limit of 20 requests per day.
 - Error Handling: Automatic 60-minute retry on connection failures.
 - Manual Update Service: Force updates instantly via service call.
+new in 1.9.0
+- Local data Provisioning for EVCC
 
 ### Installation (HACS)
 
@@ -264,6 +302,41 @@ cards:
 * **Energy:** today_total, tomorrow_total, rest_day, forecast, current_hour, next_hour
 * **Status:** api_status, api_count, last_update, next_update
 
+### EVCC Integration
+Since the Solarprognose API limits the number of direct requests, this extension allows you to bypass those restrictions by querying the data already available in Home Assistant. By leveraging the data Home Assistant has already fetched, you can provide evcc with high-frequency updates without exceeding your external API quotas.
+Instructions: Adding PV Forecast in the evcc UI
+
+#### Creating a Long-lived Access Token in HA
+1. **Open Profile:** Click on your username (profile icon) in the bottom left corner of Home Assistant.
+2. **Select Security:** Click on the **Security** tab at the top center (next to "General").
+3. **Scroll to the bottom:** Scroll down to the bottom of the Security page to the **Long-lived Access Tokens** section.
+4. **Create Token:** Click the **Create Token** button.
+5. **Assign a Name:** Give it a name so you’ll know what it’s for later (e.g., `evcc-forecast`).
+6. **Copy (Important!):** A very long code will now be displayed. Copy it immediately and save it temporarily in a text document.
+7. **Note:** Once you close the window, the key will never be displayed in plain text again. If you lose it, you must create a new one.
+
+#### Configuring the PV Forecast in EVCC
+1. **Open evcc UI:** Open your evcc dashboard in your browser (default is port 7070).
+2. **Open Configuration:** Click on **Configuration** (gear icon) in the sidebar.
+3. **Tariffs & Forecasts:** Scroll to the **"Tariffs & Forecasts"** section.
+4. **Add:** Click on **"Add Forecast"**.
+5. **Select:** Select **"Add Solar Forecast"**.
+6. **Set Name:** Enter a name (e.g., "Solar Forecast HA").
+7. **Choose Provider:** Select **"Custom"** (Benutzerdefiniert) as the provider.
+8. **Enter YAML Code:** Copy the following block into the text field:
+
+```yaml
+tariff: solar
+forecast: 
+  source: http
+  uri: "http://<Your_HA_IP_or_URL:8123>/api/states/sensor.solarprognose_prognose"
+  headers:
+    Authorization: "Bearer <your_long_lived_access_token>"
+  jq: .attributes.evcc_data
+  cache: 1h
+```
+9. **Save:** Click on "Save". evcc will verify the connection immediately. After restarting evcc, the data will be visible.
+    
 ### License
 MIT License.
 

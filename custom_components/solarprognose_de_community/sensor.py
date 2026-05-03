@@ -1,4 +1,5 @@
 import logging
+import json
 from datetime import timedelta
 from dataclasses import dataclass
 from typing import Callable, Any
@@ -22,6 +23,32 @@ _LOGGER = logging.getLogger(__name__)
 class SolarSensorEntityDescription(SensorEntityDescription):
     value_fn: Callable[[Any], Any] = None
     attr_fn: Callable[[Any], dict[str, Any]] = None
+
+def build_forecast_attrs(coord):
+    """Erstellt die Attribute fuer den Forecast-Sensor inkl. evcc-Format."""
+    sorted_data = sorted((coord.data or {}).items())
+    
+    # 1. Die originalen Home Assistant Attribute
+    attrs = {
+        "forecast": [{"datetime": dt.isoformat(), "energy": val} 
+                     for dt, val in sorted_data],
+        "integrated_forecast": True
+    }
+    
+    # 2. Das neue evcc Array aufbauen
+    # dt ist der Start der Stunde. end ist exakt eine Stunde spaeter.
+    # val ist in kWh, daher * 1000 um Watt zu erhalten.
+    evcc_list = [
+        {
+            "start": dt.isoformat(),
+            "end": (dt + timedelta(hours=1)).isoformat(),
+            "value": int(val * 1000)
+        }
+        for dt, val in sorted_data
+    ]
+    
+    attrs["evcc_data"] = json.dumps(evcc_list)
+    return attrs
 
 SENSOR_TYPES: tuple[SolarSensorEntityDescription, ...] = (
     SolarSensorEntityDescription(
@@ -99,7 +126,7 @@ SENSOR_TYPES: tuple[SolarSensorEntityDescription, ...] = (
         value_fn=lambda coord: int(max([val for dt, val in (coord.data or {}).items() 
             if dt.date() == (dt_util.now().date() + timedelta(days=1))] or [0]) * 1000),
     ),
-    SolarSensorEntityDescription(
+SolarSensorEntityDescription(
         key="forecast",
         translation_key="forecast",
         device_class=SensorDeviceClass.ENERGY,
@@ -108,11 +135,7 @@ SENSOR_TYPES: tuple[SolarSensorEntityDescription, ...] = (
         # Erzeugt den gleitenden Prognose-Wert fuer das HA-Energie-Dashboard
         value_fn=lambda coord: round(sum(val for dt, val in (coord.data or {}).items() 
             if dt.date() == dt_util.now().date() and dt <= dt_util.now()), 2),
-        attr_fn=lambda coord: {
-            "forecast": [{"datetime": dt.isoformat(), "energy": val} 
-                         for dt, val in sorted((coord.data or {}).items())],
-            "integrated_forecast": True
-        }
+        attr_fn=build_forecast_attrs
     ),
     SolarSensorEntityDescription(
         key="peak_time_tomorrow",
