@@ -38,7 +38,8 @@ neu in 1.8.0
 - Nachtruhe zwischen 21 und 3 Uhr um das API Limit von 20 Abfragen pro Tag nicht zu erreichen
 - Fehlertoleranz: Automatischer Retry nach 60 Minuten bei Verbindungsfehlern.
 - Manueller Update-Service: Sofortige Aktualisierung via Service-Call möglich.
-- Datenbereitstellung für EVCC
+neu in 1.9.0
+- Lokale Datenbereitstellung für EVCC
 
 ### Installation (HACS)
 
@@ -206,7 +207,8 @@ new in 1.8.0
 - Implement night-time suspension between 9 PM and 3 AM to stay within the API limit of 20 requests per day.
 - Error Handling: Automatic 60-minute retry on connection failures.
 - Manual Update Service: Force updates instantly via service call.
-- Data Provisioning for EVCC
+new in 1.9.0
+- Local data Provisioning for EVCC
 
 ### Installation (HACS)
 
