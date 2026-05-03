@@ -130,6 +130,7 @@ cards:
 ```
 ### EVCC Anbindung
 Diese Integration dient als intelligenter Puffer: Sie nutzt die vorhandenen Entitäten in Home Assistant, um evcc mit präzisen Daten zu versorgen, während gleichzeitig die API-Zugriffsbeschränkungen von Solarprognose.de eingehalten werden.
+
 Anleitung: PV-Vorhersage in der evcc UI hinzufügen
 #### Erstellen eine langlaufenden Zugangstokens in HA
 1. Profil öffnen: Klicke in Home Assistant ganz unten links auf deinen Benutzernamen (dein Profil-Icon).
