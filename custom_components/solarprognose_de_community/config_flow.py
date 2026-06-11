@@ -6,7 +6,7 @@ from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from .const import DOMAIN
+from .const import DOMAIN, CONF_ENABLE_AUTOMATIC_POLLING, DEFAULT_ENABLE_AUTOMATIC_POLLING
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -57,6 +57,10 @@ class SolarPrognoseConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required("name", default="Solarprognose"): str,
                 vol.Optional("api_key"): str,
                 vol.Optional("api_url"): str,
+                vol.Optional(
+                    CONF_ENABLE_AUTOMATIC_POLLING,
+                    default=DEFAULT_ENABLE_AUTOMATIC_POLLING,
+                ): bool,
             }),
             errors=errors,
         )
@@ -70,23 +74,47 @@ class SolarPrognoseOptionsFlowHandler(config_entries.OptionsFlow):
     """Behandelt Aenderungen in den Optionen."""
     async def async_step_init(self, user_input=None) -> FlowResult:
         if user_input:
-            await validate_input(self.hass, user_input)
+            def _normalize(val):
+                return (val or "").strip()
+
+            current_api_key = self.config_entry.options.get(
+                "api_key", self.config_entry.data.get("api_key", "")
+            )
+            current_api_url = self.config_entry.options.get(
+                "api_url", self.config_entry.data.get("api_url", "")
+            )
+            api_changed = (
+                _normalize(user_input.get("api_key")) != _normalize(current_api_key)
+                or _normalize(user_input.get("api_url")) != _normalize(current_api_url)
+            )
+            if api_changed:
+                await validate_input(self.hass, user_input)
             return self.async_create_entry(title="", data=user_input)
 
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema({
                 vol.Optional(
-                    "api_key", 
+                    "api_key",
                     default=self.config_entry.options.get(
                         "api_key", self.config_entry.data.get("api_key", "")
                     )
                 ): str,
                 vol.Optional(
-                    "api_url", 
+                    "api_url",
                     default=self.config_entry.options.get(
                         "api_url", self.config_entry.data.get("api_url", "")
                     )
                 ): str,
+                vol.Optional(
+                    CONF_ENABLE_AUTOMATIC_POLLING,
+                    default=self.config_entry.options.get(
+                        CONF_ENABLE_AUTOMATIC_POLLING,
+                        self.config_entry.data.get(
+                            CONF_ENABLE_AUTOMATIC_POLLING,
+                            DEFAULT_ENABLE_AUTOMATIC_POLLING,
+                        ),
+                    ),
+                ): bool,
             }),
         )

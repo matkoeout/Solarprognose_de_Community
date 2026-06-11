@@ -8,7 +8,7 @@ from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.event import async_call_later
 
 from .coordinator import SolarPrognoseCoordinator
-from .const import DOMAIN
+from .const import DOMAIN, CONF_ENABLE_AUTOMATIC_POLLING, DEFAULT_ENABLE_AUTOMATIC_POLLING
 
 _LOGGER = logging.getLogger(__name__)
 PLATFORMS: list[Platform] = [Platform.SENSOR]
@@ -20,9 +20,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Nutze Optionen falls vorhanden, sonst Basis-Daten
     api_url = entry.options.get("api_url", entry.data.get("api_url"))
     api_key = entry.options.get("api_key", entry.data.get("api_key"))
+    enable_automatic_polling = entry.options.get(
+        CONF_ENABLE_AUTOMATIC_POLLING,
+        entry.data.get(CONF_ENABLE_AUTOMATIC_POLLING, DEFAULT_ENABLE_AUTOMATIC_POLLING),
+    )
 
     # Coordinator initialisieren (noch kein API-Aufruf)
-    coordinator = SolarPrognoseCoordinator(hass, api_url, api_key)
+    coordinator = SolarPrognoseCoordinator(hass, api_url, api_key, enable_automatic_polling)
     hass.data[DOMAIN][entry.entry_id] = {"coordinator": coordinator}
 
     # 1. Plattformen (Sensoren) laden

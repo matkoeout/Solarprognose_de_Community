@@ -33,13 +33,12 @@ Diese Custom Integration bindet die WebAPI von Solarprognose.de ein. Es handelt 
 - Prognose Heute / Morgen / Resttag / Zeitpunkt der Spitzenleistung heute und morgen
 - Einbindung in das Energiedashboard
 - Leistung aktuelle & nächste Stunde
-neu in 1.8.0
 - Dynamische Abfrageintervalle: Nutzt die API-Empfehlung (`preferredNextApiRequestAt`) für optimale Aktualisierungszeiten.
-- Nachtruhe zwischen 21 und 3 Uhr um das API Limit von 20 Abfragen pro Tag nicht zu erreichen
+- Nachtruhe zwischen 21 und 3 Uhr um das API Limit nicht zu überschreiten
 - Fehlertoleranz: Automatischer Retry nach 60 Minuten bei Verbindungsfehlern.
 - Manueller Update-Service: Sofortige Aktualisierung via Service-Call möglich.
-neu in 1.9.0
 - Lokale Datenbereitstellung für EVCC
+- Automatisches Polling deaktivierbar: Volle Kontrolle über API-Abfragen per Automation.
 
 ### Installation (HACS)
 
@@ -73,6 +72,9 @@ neu in 1.9.0
 2. Klicke auf **Integration hinzufügen**.
 3. Suche nach **Solarprognose.de (Community)**.
 4. Gib deinen API-Key oder die API-URL ein.
+5. Optional: Aktiviere oder deaktiviere die **automatische Aktualisierung**.
+
+> **Automatische Aktualisierung:** Wenn aktiviert, fragt die Integration die API selbstständig ab und passt das Intervall dynamisch anhand der API-Empfehlung an. Wenn deaktiviert, werden Daten nur bei manuellem Aufruf per Service-Call abgerufen – sinnvoll, wenn du das Polling selbst über eine Automatisierung steuerst oder das tägliche API-Limit schonen möchtest.
 
 ### Dashboard Integration
 Du kannst die Daten ganz einfach visualisieren. Ein vollständiges Beispiel für das neue **Abschnitte (Sections) Dashboard** findest du auf GitHub unter:  
@@ -168,10 +170,20 @@ forecast:
 
 ### Sensoren
 * **Energie:** today_total, tomorrow_total, rest_day, forecast, current_hour, next_hour
+* **Spitzenleistung:** peak_power_today, peak_time_today, peak_power_tomorrow, peak_time_tomorrow
 * **Status:** api_status, api_count, last_update, next_update
 
 ### Lizenz
 MIT Lizenz.
+
+### Changelog
+| Version | Änderungen |
+|---------|-----------|
+| 2.0.0 | Automatisches Polling deaktivierbar. Volle Kontrolle über API-Abfragen per Automation. |
+| 1.9.0 | Einbindung in evcc. |
+| 1.8.0 | Dynamische Abfrageintervalle. Nachtruhe (21–3 Uhr). Fehlertoleranz mit 60-Min.-Retry. Manueller Update-Service. |
+| 1.7.0 | Einbindung in das Energiedashboard. Bugfix Zeitberechnung. Erweiterte Unit-Tests. |
+| 1.6.0 | Migration auf Python / Custom Component. DataUpdateCoordinator. Konfiguration über UI. Peak-Sensoren. Diagnose-Schnittstelle. API-Zähler mit Restart-Persistenz. |
 ---
 
 <a name="-english"></a>
@@ -198,18 +210,17 @@ BY INSTALLING AND USING THIS INTEGRATION, YOU EXPRESSLY AGREE TO THESE TERMS.
 This custom integration connects the Solarprognose.de WebAPI to Home Assistant. This is an **unofficial community integration** and has no affiliation with the operators of Solarprognose.de.
 
 ### Features
-- Forecast Today / Tomorrow / Remaining Day / time for peakpower today and tomorrow
+- Forecast Today / Tomorrow / Remaining Day / time for peak power today and tomorrow
 - Supporting the energy dashboard
 - Power Current & Next Hour
 - API Status & Request Counter
 - Next update time tracking
-new in 1.8.0
 - Dynamic Update Intervals: Automatically follows API recommendations (preferredNextApiRequestAt).
-- Implement night-time suspension between 9 PM and 3 AM to stay within the API limit of 20 requests per day.
+- Night-time suspension between 9 PM and 3 AM to stay within the API limit.
 - Error Handling: Automatic 60-minute retry on connection failures.
 - Manual Update Service: Force updates instantly via service call.
-new in 1.9.0
-- Local data Provisioning for EVCC
+- Local data provisioning for EVCC
+- Automatic polling can be disabled: Full control over API requests via automation.
 
 ### Installation (HACS)
 
@@ -242,6 +253,9 @@ new in 1.9.0
 2. Click **Add Integration**.
 3. Search for **Solarprognose.de (Community)**.
 4. Enter your API Key or API URL.
+5. Optionally enable or disable **automatic updates**.
+
+> **Automatic updates:** When enabled, the integration polls the API automatically and adjusts the interval dynamically based on the API's recommendation. When disabled, data is only fetched on manual refresh via service call — useful if you control polling via an automation or want to conserve your daily API limit.
 
 ### Dashboard Integration
 You can easily visualize the forecast data. A complete example for the new Sections Dashboard can be found on GitHub:  
@@ -300,6 +314,7 @@ cards:
 
 ### Sensors
 * **Energy:** today_total, tomorrow_total, rest_day, forecast, current_hour, next_hour
+* **Peak power:** peak_power_today, peak_time_today, peak_power_tomorrow, peak_time_tomorrow
 * **Status:** api_status, api_count, last_update, next_update
 
 ### EVCC Integration
@@ -339,6 +354,15 @@ forecast:
     
 ### License
 MIT License.
+
+### Changelog
+| Version | Changes |
+|---------|---------|
+| 2.0.0 | Automatic polling can be disabled. Full control over API requests via automation. |
+| 1.9.0 | evcc integration. |
+| 1.8.0 | Dynamic update intervals. Night-time suspension (9 PM–3 AM). 60-minute retry on errors. Manual update service. |
+| 1.7.0 | Energy dashboard integration. Bugfix for update time calculation. Extended unit tests. |
+| 1.6.0 | Migration to Python / custom component. DataUpdateCoordinator. UI-based configuration. Peak sensors. Diagnostics support. API call counter with restart persistence. |
 
 <a name="-screenshot"></a>
 ### Sampledashboards

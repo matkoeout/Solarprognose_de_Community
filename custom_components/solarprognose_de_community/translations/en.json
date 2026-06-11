@@ -8,7 +8,8 @@
         "data": {
           "name": "System Name",
           "api_key": "API Key (for single systems)",
-          "api_url": "API URL (overrides Key - for complex configurations with multiple sub-systems)"
+          "api_url": "API URL (overrides Key - for complex configurations with multiple sub-systems)",
+          "enable_automatic_polling": "Enable automatic updates"
         }
       }
     },
@@ -27,7 +28,8 @@
         "description": "Provide an API key OR a URL. (Note: A test call consumes 1 API credit).",
         "data": {
           "api_key": "API Key (for single systems)",
-          "api_url": "API URL (overrides Key - for complex configurations with multiple sub-systems)"
+          "api_url": "API URL (overrides Key - for complex configurations with multiple sub-systems)",
+          "enable_automatic_polling": "Enable automatic updates"
         }
       }
     },
@@ -41,20 +43,48 @@
   },
   "entity": {
     "sensor": {
-      "today_total": { "name": "Today Total" },
-      "tomorrow_total": { "name": "Tomorrow Total" },
-      "rest_day": { "name": "Remaining Today" },
-      "current_hour": { "name": "Current Hour" },
-      "next_hour": { "name": "Next Hour" },
-      "forecast": { "name": "Forecast" },
-      "api_status": { "name": "API Status" },
-      "api_count": { "name": "API Calls Today" },
-      "next_update": { "name": "Next Update Time" },
-      "last_update": { "name": "Last Update" },
-      "peak_power_today": { "name": "Peak Power Today" },
-      "peak_time_today": { "name": "Peak Power Time Today" },
-      "peak_power_tomorrow": { "name": "Peak Power Tomorrow" },
-      "peak_time_tomorrow": { "name": "Peak Power Time Tomorrow" }
+      "today_total": {
+        "name": "Today Total"
+      },
+      "tomorrow_total": {
+        "name": "Tomorrow Total"
+      },
+      "rest_day": {
+        "name": "Remaining Today"
+      },
+      "current_hour": {
+        "name": "Current Hour"
+      },
+      "next_hour": {
+        "name": "Next Hour"
+      },
+      "forecast": {
+        "name": "Forecast"
+      },
+      "api_status": {
+        "name": "API Status"
+      },
+      "api_count": {
+        "name": "API Calls Today"
+      },
+      "next_update": {
+        "name": "Next Update Time"
+      },
+      "last_update": {
+        "name": "Last Update"
+      },
+      "peak_power_today": {
+        "name": "Peak Power Today"
+      },
+      "peak_time_today": {
+        "name": "Peak Power Time Today"
+      },
+      "peak_power_tomorrow": {
+        "name": "Peak Power Tomorrow"
+      },
+      "peak_time_tomorrow": {
+        "name": "Peak Power Time Tomorrow"
+      }
     }
   }
 }

@@ -7,20 +7,22 @@ from homeassistant.util import dt as dt_util
 from homeassistant.helpers.event import async_call_later
 from homeassistant.core import callback, HomeAssistant
 
-from .const import DOMAIN, NIGHT_START_HOUR, NIGHT_END_HOUR
+from .const import DOMAIN, NIGHT_START_HOUR, NIGHT_END_HOUR, CONF_ENABLE_AUTOMATIC_POLLING
 
 _LOGGER = logging.getLogger(__name__)
+MIN_UPDATE_INTERVAL = timedelta(minutes=30)
 
 class SolarPrognoseCoordinator(DataUpdateCoordinator):
     """Zentrale Instanz zum Abrufen und Aufbereiten der Prognosedaten."""
     
-    def __init__(self, hass: HomeAssistant, api_url=None, api_key=None):
+    def __init__(self, hass: HomeAssistant, api_url=None, api_key=None, enable_automatic_polling: bool = True):
         # Falls keine fertige URL geliefert wurde, bauen wir sie aus dem API-Key zusammen
         self.api_url = api_url or (
             "https://www.solarprognose.de/web/solarprediction/api/v1"
             f"?access-token={api_key}&type=hourly&_format=json"
         )
         
+        self._enable_automatic_polling = enable_automatic_polling
         super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=None)
         
         self.api_status = None
@@ -33,6 +35,10 @@ class SolarPrognoseCoordinator(DataUpdateCoordinator):
 
     async def async_setup(self):
         """Initiales Setup: Berücksichtigt die Nachtruhe auch beim Systemstart."""
+        if not self._enable_automatic_polling:
+            _LOGGER.info("Automatisches Polling deaktiviert. Kein automatischer Abruf.")
+            return
+
         now = dt_util.now()
         
         # 1. Prüfen, ob wir uns aktuell in der Nachtruhe befinden
@@ -168,6 +174,12 @@ class SolarPrognoseCoordinator(DataUpdateCoordinator):
 
     def _schedule_next_update(self, delay: timedelta):
         """Plant das naechste Update."""
+        if not self._enable_automatic_polling:
+            return
+
+        # Mindestintervall als Schutz vor unerwarteten kurzfristigen Empfehlungen
+        delay = max(delay, MIN_UPDATE_INTERVAL)
+
         if self._unsub_next_update:
             self._unsub_next_update()
 
