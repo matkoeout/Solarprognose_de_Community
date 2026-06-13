@@ -52,7 +52,11 @@ class SolarPollingSwitch(CoordinatorEntity, RestoreEntity, SwitchEntity):
     async def async_turn_on(self, **kwargs) -> None:
         self.coordinator.enable_automatic_polling = True
         self.async_write_ha_state()
+        # Abhaengige Entitaeten (z.B. 'Naechster geplanter Lauf') neu bewerten lassen
+        self.coordinator.async_update_listeners()
 
     async def async_turn_off(self, **kwargs) -> None:
         self.coordinator.enable_automatic_polling = False
         self.async_write_ha_state()
+        # Abhaengige Entitaeten (z.B. 'Naechster geplanter Lauf') neu bewerten lassen
+        self.coordinator.async_update_listeners()

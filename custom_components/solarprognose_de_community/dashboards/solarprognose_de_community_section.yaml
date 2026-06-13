@@ -74,8 +74,15 @@ views:
                     name: API Aufrufe (Counter)
                   - entity: sensor.solarprognose_letzte_abfrage
                     name: Letzter Abruf
-                  - entity: sensor.solarprognose_nachste_abfragezeit
-                    name: Nächster geplanter Abruf
+                  # Zeile nur anzeigen, wenn das automatische Polling aktiv ist
+                  # (sonst ist der Sensor 'nicht verfuegbar', da kein Lauf geplant ist)
+                  - type: conditional
+                    conditions:
+                      - entity: switch.solarprognose_automatische_aktualisierung
+                        state: "on"
+                    row:
+                      entity: sensor.solarprognose_nachste_abfragezeit
+                      name: Nächster geplanter Abruf
                   - type: divider
-                  - entity: switch.solar_solarprognose_automatische_aktualisierung
+                  - entity: switch.solarprognose_automatische_aktualisierung
                     name: Automatisches Polling
