@@ -77,10 +77,5 @@ views:
                   - entity: sensor.solarprognose_nachste_abfragezeit
                     name: Nächster geplanter Abruf
                   - type: divider
-                  - type: button
-                    name: Daten jetzt manuell abrufen
-                    icon: mdi:refresh
-                    action_name: Update
-                    tap_action:
-                      action: call-service
-                      service: solarprognose_de_community.update
+                  - entity: switch.solarprognose_automatische_aktualisierung
+                    name: Automatisches Polling
