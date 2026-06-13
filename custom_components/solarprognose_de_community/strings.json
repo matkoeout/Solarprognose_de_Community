@@ -8,8 +8,7 @@
         "data": {
           "name": "Anlagenname",
           "api_key": "API Key (für Einzelanlagen)",
-          "api_url": "API URL (alternativ für komplexe Konfigurationen mit mehreren Anlagenteilen)",
-          "enable_automatic_polling": "Automatische Aktualisierung aktivieren"
+          "api_url": "API URL (alternativ für komplexe Konfigurationen mit mehreren Anlagenteilen)"
         }
       }
     },
@@ -28,8 +27,7 @@
         "description": "Gib einen API-Key ODER eine URL an. (Hinweis: Ein Test-Aufruf verbraucht 1 API-Credit).",
         "data": {
           "api_key": "API Key (für Einzelanlagen)",
-          "api_url": "API URL (alternativ für komplexe Konfigurationen mit mehreren Anlagenteilen)",
-          "enable_automatic_polling": "Automatische Aktualisierung aktivieren"
+          "api_url": "API URL (alternativ für komplexe Konfigurationen mit mehreren Anlagenteilen)"
         }
       }
     },
@@ -84,6 +82,11 @@
       },
       "peak_time_tomorrow": {
         "name": "Zeitpunkt Spitzenleistung morgen"
+      }
+    },
+    "switch": {
+      "enable_automatic_polling": {
+        "name": "Automatische Aktualisierung"
       }
     }
   }

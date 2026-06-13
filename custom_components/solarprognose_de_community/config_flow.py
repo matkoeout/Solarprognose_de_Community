@@ -6,7 +6,7 @@ from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from .const import DOMAIN, CONF_ENABLE_AUTOMATIC_POLLING, DEFAULT_ENABLE_AUTOMATIC_POLLING
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -57,10 +57,6 @@ class SolarPrognoseConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required("name", default="Solarprognose"): str,
                 vol.Optional("api_key"): str,
                 vol.Optional("api_url"): str,
-                vol.Optional(
-                    CONF_ENABLE_AUTOMATIC_POLLING,
-                    default=DEFAULT_ENABLE_AUTOMATIC_POLLING,
-                ): bool,
             }),
             errors=errors,
         )
@@ -106,15 +102,5 @@ class SolarPrognoseOptionsFlowHandler(config_entries.OptionsFlow):
                         "api_url", self.config_entry.data.get("api_url", "")
                     )
                 ): str,
-                vol.Optional(
-                    CONF_ENABLE_AUTOMATIC_POLLING,
-                    default=self.config_entry.options.get(
-                        CONF_ENABLE_AUTOMATIC_POLLING,
-                        self.config_entry.data.get(
-                            CONF_ENABLE_AUTOMATIC_POLLING,
-                            DEFAULT_ENABLE_AUTOMATIC_POLLING,
-                        ),
-                    ),
-                ): bool,
             }),
         )

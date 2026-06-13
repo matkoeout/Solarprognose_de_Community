@@ -8,8 +8,7 @@
         "data": {
           "name": "System Name",
           "api_key": "API Key (for single systems)",
-          "api_url": "API URL (overrides Key - for complex configurations with multiple sub-systems)",
-          "enable_automatic_polling": "Enable automatic updates"
+          "api_url": "API URL (overrides Key - for complex configurations with multiple sub-systems)"
         }
       }
     },
@@ -28,8 +27,7 @@
         "description": "Provide an API key OR a URL. (Note: A test call consumes 1 API credit).",
         "data": {
           "api_key": "API Key (for single systems)",
-          "api_url": "API URL (overrides Key - for complex configurations with multiple sub-systems)",
-          "enable_automatic_polling": "Enable automatic updates"
+          "api_url": "API URL (overrides Key - for complex configurations with multiple sub-systems)"
         }
       }
     },
@@ -84,6 +82,11 @@
       },
       "peak_time_tomorrow": {
         "name": "Peak Power Time Tomorrow"
+      }
+    },
+    "switch": {
+      "enable_automatic_polling": {
+        "name": "Automatic Updates"
       }
     }
   }
