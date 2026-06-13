@@ -6,7 +6,7 @@ views:
       - icon: mdi:solar-power
         cards:
           - type: heading
-            icon: ''
+            icon: ""
             heading: Aktuelle Prognose
             heading_style: title
           - type: vertical-stack
@@ -77,5 +77,5 @@ views:
                   - entity: sensor.solarprognose_nachste_abfragezeit
                     name: Nächster geplanter Abruf
                   - type: divider
-                  - entity: switch.solarprognose_automatische_aktualisierung
+                  - entity: switch.solar_solarprognose_automatische_aktualisierung
                     name: Automatisches Polling
