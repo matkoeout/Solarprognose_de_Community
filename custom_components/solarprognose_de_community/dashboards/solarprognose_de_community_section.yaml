@@ -85,4 +85,4 @@ views:
                       name: Nächster geplanter Abruf
                   - type: divider
                   - entity: switch.solarprognose_automatische_aktualisierung
-                    name: Automatisches Polling
+                    name: Automatische Aktualisierung
