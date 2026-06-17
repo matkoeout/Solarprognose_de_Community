@@ -74,8 +74,6 @@ views:
                     name: API Aufrufe (Counter)
                   - entity: sensor.solarprognose_letzte_abfrage
                     name: Letzter Abruf
-                  # Zeile nur anzeigen, wenn das automatische Polling aktiv ist
-                  # (sonst ist der Sensor 'nicht verfuegbar', da kein Lauf geplant ist)
                   - type: conditional
                     conditions:
                       - entity: switch.solarprognose_automatische_aktualisierung
@@ -86,3 +84,11 @@ views:
                   - type: divider
                   - entity: switch.solarprognose_automatische_aktualisierung
                     name: Automatische Aktualisierung
+                  - type: button
+                    name: Daten jetzt manuell abrufen
+                    icon: mdi:refresh
+                    action_name: Update
+                    tap_action:
+                      action: call-service
+                      service: solarprognose_de_community.update
+                      
