@@ -6,7 +6,7 @@ views:
       - icon: mdi:solar-power
         cards:
           - type: heading
-            icon: ''
+            icon: ""
             heading: Aktuelle Prognose
             heading_style: title
           - type: vertical-stack
@@ -74,9 +74,16 @@ views:
                     name: API Aufrufe (Counter)
                   - entity: sensor.solarprognose_letzte_abfrage
                     name: Letzter Abruf
-                  - entity: sensor.solarprognose_nachste_abfragezeit
-                    name: Nächster geplanter Abruf
+                  - type: conditional
+                    conditions:
+                      - entity: switch.solarprognose_automatische_aktualisierung
+                        state: "on"
+                    row:
+                      entity: sensor.solarprognose_nachste_abfragezeit
+                      name: Nächster geplanter Abruf
                   - type: divider
+                  - entity: switch.solarprognose_automatische_aktualisierung
+                    name: Automatische Aktualisierung
                   - type: button
                     name: Daten jetzt manuell abrufen
                     icon: mdi:refresh
@@ -84,3 +91,4 @@ views:
                     tap_action:
                       action: call-service
                       service: solarprognose_de_community.update
+                      

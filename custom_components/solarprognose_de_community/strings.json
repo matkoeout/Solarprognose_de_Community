@@ -41,20 +41,53 @@
   },
   "entity": {
     "sensor": {
-      "today_total": { "name": "Heute Gesamt" },
-      "tomorrow_total": { "name": "Morgen Gesamt" },
-      "rest_day": { "name": "Resttag" },
-      "current_hour": { "name": "Aktuelle Stunde" },
-      "next_hour": { "name": "Nächste Stunde" },
-      "forecast": { "name": "Prognose" },
-      "api_status": { "name": "API Status" },
-      "api_count": { "name": "API Abfragen heute" },
-      "next_update": { "name": "Nächste Abfragezeit" },
-      "last_update": { "name": "Letzte Abfrage" },
-      "peak_power_today": { "name": "Spitzenleistung heute" },
-      "peak_time_today": { "name": "Zeitpunkt Spitzenleistung heute" },
-      "peak_power_tomorrow": { "name": "Spitzenleistung morgen" },
-      "peak_time_tomorrow": { "name": "Zeitpunkt Spitzenleistung morgen" }
+      "today_total": {
+        "name": "Heute Gesamt"
+      },
+      "tomorrow_total": {
+        "name": "Morgen Gesamt"
+      },
+      "rest_day": {
+        "name": "Resttag"
+      },
+      "current_hour": {
+        "name": "Aktuelle Stunde"
+      },
+      "next_hour": {
+        "name": "Nächste Stunde"
+      },
+      "forecast": {
+        "name": "Prognose"
+      },
+      "api_status": {
+        "name": "API Status"
+      },
+      "api_count": {
+        "name": "API Abfragen heute"
+      },
+      "next_update": {
+        "name": "Nächste Abfragezeit"
+      },
+      "last_update": {
+        "name": "Letzte Abfrage"
+      },
+      "peak_power_today": {
+        "name": "Spitzenleistung heute"
+      },
+      "peak_time_today": {
+        "name": "Zeitpunkt Spitzenleistung heute"
+      },
+      "peak_power_tomorrow": {
+        "name": "Spitzenleistung morgen"
+      },
+      "peak_time_tomorrow": {
+        "name": "Zeitpunkt Spitzenleistung morgen"
+      }
+    },
+    "switch": {
+      "enable_automatic_polling": {
+        "name": "Automatische Aktualisierung"
+      }
     }
   }
 }

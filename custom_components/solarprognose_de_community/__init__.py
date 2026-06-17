@@ -11,7 +11,7 @@ from .coordinator import SolarPrognoseCoordinator
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
-PLATFORMS: list[Platform] = [Platform.SENSOR]
+PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.SWITCH]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Setzt die Integration ueber einen Config Entry auf."""
@@ -20,8 +20,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Nutze Optionen falls vorhanden, sonst Basis-Daten
     api_url = entry.options.get("api_url", entry.data.get("api_url"))
     api_key = entry.options.get("api_key", entry.data.get("api_key"))
-
     # Coordinator initialisieren (noch kein API-Aufruf)
+    # enable_automatic_polling startet per Default auf True; die Laufzeit-Steuerung
+    # erfolgt ausschliesslich ueber die Switch-Entity (RestoreEntity).
     coordinator = SolarPrognoseCoordinator(hass, api_url, api_key)
     hass.data[DOMAIN][entry.entry_id] = {"coordinator": coordinator}
 
@@ -72,5 +73,6 @@ async def update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Entlaedt einen Config Entry."""
     if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
-        hass.data[DOMAIN].pop(entry.entry_id)
+        data = hass.data[DOMAIN].pop(entry.entry_id)
+        data["coordinator"].async_unload()
     return unload_ok

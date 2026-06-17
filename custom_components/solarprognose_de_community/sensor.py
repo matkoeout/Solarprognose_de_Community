@@ -251,6 +251,16 @@ class SolarSensor(CoordinatorEntity, RestoreEntity, SensorEntity):
             _LOGGER.error("Fehler beim Wiederherstellen von %s: %s", self.entity_description.key, err)
 
     @property
+    def available(self) -> bool:
+        """Setzt den 'Naechster geplanter Lauf'-Sensor auf 'nicht verfuegbar',
+        wenn das automatische Polling deaktiviert ist (dann gibt es keinen
+        geplanten Lauf). Das Dashboard blendet die Zeile zusaetzlich per
+        conditional-Bedingung komplett aus."""
+        if self.entity_description.key == "next_update" and not self.coordinator.enable_automatic_polling:
+            return False
+        return super().available
+
+    @property
     def native_value(self):
         """Gibt den aktuellen Status des Sensors zurueck."""
         # 1. Wenn der Coordinator Daten hat, nutzen wir diese (Normalbetrieb)

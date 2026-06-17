@@ -10,29 +10,35 @@ from homeassistant.core import callback, HomeAssistant
 from .const import DOMAIN, NIGHT_START_HOUR, NIGHT_END_HOUR
 
 _LOGGER = logging.getLogger(__name__)
+MIN_UPDATE_INTERVAL = timedelta(minutes=30)
 
 class SolarPrognoseCoordinator(DataUpdateCoordinator):
     """Zentrale Instanz zum Abrufen und Aufbereiten der Prognosedaten."""
     
-    def __init__(self, hass: HomeAssistant, api_url=None, api_key=None):
+    def __init__(self, hass: HomeAssistant, api_url=None, api_key=None, enable_automatic_polling: bool = True):
         # Falls keine fertige URL geliefert wurde, bauen wir sie aus dem API-Key zusammen
         self.api_url = api_url or (
             "https://www.solarprognose.de/web/solarprediction/api/v1"
             f"?access-token={api_key}&type=hourly&_format=json"
         )
         
+        self._enable_automatic_polling = enable_automatic_polling
         super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=None)
         
         self.api_status = None
         self.api_message = ""
         self.next_api_request = None
         self.last_api_success = None
-        self.api_count_today = 0
+        self._api_count_today = 0
         self.last_reset_day = dt_util.now().date()
         self._unsub_next_update = None
 
     async def async_setup(self):
         """Initiales Setup: Berücksichtigt die Nachtruhe auch beim Systemstart."""
+        if not self._enable_automatic_polling:
+            _LOGGER.info("Automatisches Polling deaktiviert. Kein automatischer Abruf.")
+            return
+
         now = dt_util.now()
         
         # 1. Prüfen, ob wir uns aktuell in der Nachtruhe befinden
@@ -66,11 +72,7 @@ class SolarPrognoseCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self):
         """Daten von der API abrufen und verarbeiten."""
         now = dt_util.now()
-        
-        # Damit springt der Sensor in HA um Mitternacht sofort auf 0.
-        if now.date() > self.last_reset_day:
-            self.api_count_today = 0
-            self.last_reset_day = now.date()
+        self._check_daily_reset()
 
         # Wenn es zwischen 21:00 und 03:00 ist, brechen wir hier ab.
         if now.hour >= NIGHT_START_HOUR or now.hour < NIGHT_END_HOUR:
@@ -112,7 +114,7 @@ class SolarPrognoseCoordinator(DataUpdateCoordinator):
                         return self.data or {}
                     # Zähler und Zeitpunkt nur bei OK
                     if self.api_status == 0:
-                        self.api_count_today += 1
+                        self._api_count_today += 1
                         self.last_api_success = now
 
                     # Empfehlung der API für den naechsten optimalen Abrufzeitpunkt speichern
@@ -168,6 +170,12 @@ class SolarPrognoseCoordinator(DataUpdateCoordinator):
 
     def _schedule_next_update(self, delay: timedelta):
         """Plant das naechste Update."""
+        if not self._enable_automatic_polling:
+            return
+
+        # Mindestintervall als Schutz vor unerwarteten kurzfristigen Empfehlungen
+        delay = max(delay, MIN_UPDATE_INTERVAL)
+
         if self._unsub_next_update:
             self._unsub_next_update()
 
@@ -181,6 +189,49 @@ class SolarPrognoseCoordinator(DataUpdateCoordinator):
             _fire_refresh
         )
 
+    def _check_daily_reset(self):
+        """Setzt den API-Zaehler zurueck, falls ein Tageswechsel stattgefunden hat.
+
+        Wird lazy bei jedem Zugriff auf api_count_today und bei jedem
+        Coordinator-Update geprueft. Funktioniert daher auch dann, wenn
+        das automatische Polling deaktiviert ist - sobald irgendeine
+        Entitaet ihren State liest, wird der Reset nachgeholt.
+        """
+        now = dt_util.now()
+        if now.date() > self.last_reset_day:
+            self._api_count_today = 0
+            self.last_reset_day = now.date()
+            _LOGGER.info("API-Zaehler zuruecksetzen (Tageswechsel erkannt).")
+
+    @property
+    def api_count_today(self) -> int:
+        self._check_daily_reset()
+        return self._api_count_today
+
+    @api_count_today.setter
+    def api_count_today(self, value: int) -> None:
+        self._api_count_today = value
+
+    @property
+    def enable_automatic_polling(self) -> bool:
+        return self._enable_automatic_polling
+
+    @enable_automatic_polling.setter
+    def enable_automatic_polling(self, value: bool) -> None:
+        if value == self._enable_automatic_polling:
+            return
+
+        self._enable_automatic_polling = value
+
+        if value:
+            _LOGGER.info("Automatisches Polling aktiviert.")
+            self.hass.async_create_task(self.async_setup())
+        else:
+            _LOGGER.info("Automatisches Polling deaktiviert.")
+            if self._unsub_next_update:
+                self._unsub_next_update()
+                self._unsub_next_update = None
+
     def set_api_count(self, count: int):
         self.api_count_today = count
 
@@ -190,3 +241,10 @@ class SolarPrognoseCoordinator(DataUpdateCoordinator):
 
     def async_set_updated_data(self, data):
         self.data = data
+
+    @callback
+    def async_unload(self):
+        """Meldet alle Timer/Listener ab."""
+        if self._unsub_next_update:
+            self._unsub_next_update()
+            self._unsub_next_update = None
